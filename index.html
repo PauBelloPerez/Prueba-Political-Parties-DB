@@ -1,11 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=index_2.html">
-  <title>Redirect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Political Parties Database</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face {
+      font-family: 'Excelsor';
+      src: url('ExcelsorBold.woff2') format('woff2'),
+           url('ExcelsorBold.woff') format('woff'),
+           url('ExcelsorBold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: #F4F0EA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .splash {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+      background: #C8102E;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 500;
+      font-size: 13px;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .logo-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+      gap: 3px;
+    }
+
+    .logo-title strong {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1C1714;
+    }
+
+    .logo-title span {
+      font-size: 16px;
+      font-family: 'Excelsor', Georgia, serif;
+      font-weight: 700;
+      color: #C8102E;
+      letter-spacing: 0.02em;
+    }
+
+    .divider {
+      width: 40px;
+      height: 2px;
+      background: #C8102E;
+      border-radius: 1px;
+    }
+
+    .loading {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #C8102E;
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+      40%            { opacity: 1;    transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  <!-- Redirect after 2s so the splash is visible -->
+  <meta http-equiv="refresh" content="2; url=index_2.html">
 </head>
 <body>
-  <p>Redirigiendo...</p>
+  <div class="splash">
+    <div class="logo">
+      <div class="logo-icon">PPD</div>
+      <div class="logo-title">
+        <strong>Political Parties Database</strong>
+        <span>Universitat Pompeu Fabra</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="loading">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
 </body>
 </html>
