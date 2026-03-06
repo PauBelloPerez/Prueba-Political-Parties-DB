@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Methodology – Political Parties Database</title>
+  <meta name="description" content="Definitions, inclusion criteria, data sources and update process for the Political Parties Database." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    @font-face {
+      font-family: 'Excelsor';
+      src: url('ExcelsorBold.woff2') format('woff2'),
+           url('ExcelsorBold.woff') format('woff'),
+           url('ExcelsorBold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ========== Design Tokens ========== */
+    :root {
+      --bg: #F4F0EA;
+      --card: #FDFAF5;
+      --text: #1C1714;
+      --text-secondary: #6B5D52;
+      --muted: #9C8D82;
+      --border: #D8CFC4;
+      --border-light: #EDE7DF;
+
+      --brand: #C8102E;
+      --brand-hover: #C8102E;
+      --brand-light: #F5E4E6;
+
+      --radius: 4px;
+      --radius-lg: 6px;
+      --shadow: 0 1px 4px rgba(28, 23, 20, 0.07), 0 1px 2px rgba(28, 23, 20, 0.05);
+      --shadow-lg: 0 8px 28px rgba(28, 23, 20, 0.12), 0 3px 8px rgba(28, 23, 20, 0.06);
+
+      --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-mono: 'DM Mono', 'Courier New', monospace;
+      --font-upf: 'Excelsor', Georgia, serif;
+      --upf-red: #C8102E;
+
+      --header-height: 64px;
+    }
+
+    /* ========== Reset ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== Header ========== */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      border-top: 4px solid var(--brand);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      height: var(--header-height);
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+    .logo:hover { color: var(--brand); }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--brand);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .logo-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .logo-title strong {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .logo-title span {
+      font-size: 14px;
+      font-family: var(--font-upf);
+      font-weight: 700;
+      color: var(--upf-red);
+      letter-spacing: 0.02em;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .nav-link:hover { color: var(--brand); background: var(--brand-light); }
+    .nav-link.active { color: var(--brand); font-weight: 600; }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 14px; right: 14px;
+      height: 2px;
+      background: var(--brand);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    /* ========== Page layout ========== */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      min-height: calc(100vh - var(--header-height) - 100px);
+    }
+
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--text);
+      max-width: 860px;
+    }
+
+    .page-title {
+      font-size: 44px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .page-description {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 300;
+      line-height: 1.75;
+      max-width: 580px;
+    }
+
+    /* ========== Two-column layout ========== */
+    .methodology-grid {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 56px;
+      align-items: start;
+      max-width: 1100px;
+    }
+
+    /* ========== Sections ========== */
+    .method-section {
+      margin-bottom: 52px;
+    }
+    .method-section:last-child { margin-bottom: 0; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 14px;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 18px;
+    }
+
+    .section-body {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      font-weight: 300;
+    }
+    .section-body p + p { margin-top: 14px; }
+    .section-body a {
+      color: var(--brand);
+      text-decoration: none;
+      border-bottom: 1px solid var(--brand-light);
+      transition: border-color 0.2s;
+    }
+    .section-body a:hover { border-color: var(--brand); }
+
+    /* ========== Definition list ========== */
+    /* Para añadir términos: duplicar un .def-item dentro de .def-list */
+    .def-list {
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .def-item {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .def-item:last-child { border-bottom: 0; }
+
+    .def-term {
+      padding: 14px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--bg);
+      border-right: 1px solid var(--border-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.5;
+    }
+
+    .def-desc {
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      background: var(--card);
+    }
+
+    /* ========== Sources list ========== */
+    /* Para añadir fuentes: duplicar un .source-item dentro de .source-list */
+    .source-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .source-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .source-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .source-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .source-url {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--brand);
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .source-url:hover { text-decoration: underline; }
+
+    /* ========== Divider ========== */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 44px 0;
+    }
+
+    /* ========== Placeholder ========== */
+    .placeholder-block {
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      line-height: 1.6;
+    }
+    .placeholder-block strong {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      color: var(--border);
+    }
+
+    /* ========== TOC sidebar ========== */
+    .toc-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: sticky;
+      top: calc(var(--header-height) + 24px);
+    }
+
+    .toc-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--text);
+    }
+    .toc-header h3 {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: #F4F0EA;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .toc-body {
+      padding: 8px 0;
+    }
+
+    /* Para añadir entradas al TOC: duplicar un .toc-link */
+    .toc-link {
+      display: block;
+      padding: 9px 18px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .toc-link:hover {
+      color: var(--brand);
+      background: var(--brand-light);
+      border-left-color: var(--brand);
+    }
+    .toc-link.active {
+      color: var(--brand);
+      font-weight: 600;
+      border-left-color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    /* ========== Site Footer ========== */
+    .site-footer {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .footer-container a { color: var(--brand); text-decoration: none; }
+    .footer-container a:hover { text-decoration: underline; }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 900px) {
+      .methodology-grid { grid-template-columns: 1fr; }
+      .toc-card { position: static; }
+    }
+
+    @media (max-width: 768px) {
+      .header-container { padding: 0 16px; }
+      .nav {
+        display: none;
+        position: absolute;
+        top: var(--header-height);
+        left: 0; right: 0;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        flex-direction: column;
+        padding: 16px;
+        gap: 4px;
+      }
+      .nav.mobile-open { display: flex; }
+      .nav-link { width: 100%; text-align: left; }
+      .nav-link.active::after { display: none; }
+      .menu-toggle { display: block; }
+      .main-content { padding: 32px 16px 64px; }
+      .page-title { font-size: 32px; }
+      .def-item { grid-template-columns: 1fr; }
+      .def-term { border-right: 0; border-bottom: 1px solid var(--border-light); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== Header ========== -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index_2.html" class="logo">
+        <div class="logo-icon">PPDB</div>
+        <div class="logo-title">
+          <strong>Political Parties DB</strong>
+          <span>Universitat Pompeu Fabra</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+
+      <nav class="nav" id="mainNav">
+        <a href="index_2.html" class="nav-link">Data</a>
+        <a href="about_2.html" class="nav-link">About</a>
+        <a href="methodology_2.html" class="nav-link active">Methodology</a>
+        <a href="contact_2.html" class="nav-link">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========== Main ========== -->
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1 class="page-title">Methodology</h1>
+      <p class="page-description">
+        Definitions, inclusion criteria, data sources and how the dataset is maintained over time.
+      </p>
+    </div>
+
+    <div class="methodology-grid">
+
+      <!-- ===== LEFT: content ===== -->
+      <div>
+
+        <!-- SECTION: Definitions -->
+        <!-- Para añadir términos: duplicar .def-item dentro de .def-list -->
+        <div class="method-section" id="sec-definitions">
+          <div class="section-label">01 — Definitions</div>
+          <h2 class="section-heading">Key concepts and criteria</h2>
+          <div class="section-body">
+            <p>The following definitions govern what is included in the database and how ambiguous cases are handled.</p>
+          </div>
+          <div class="def-list" style="margin-top: 20px;">
+
+            <div class="def-item">
+              <div class="def-term">Party</div>
+              <div class="def-desc">
+                <!-- Añadir definición aquí -->
+                <span style="color: var(--border); font-style: italic;">Definition pending.</span>
+              </div>
+            </div>
+
+            <div class="def-item">
+              <div class="def-term">Leader</div>
+              <div class="def-desc">
+                <!-- Añadir definición aquí -->
+                <span style="color: var(--border); font-style: italic;">Definition pending.</span>
+              </div>
+            </div>
+
+            <div class="def-item">
+              <div class="def-term">Region</div>
+              <div class="def-desc">
+                <!-- Añadir definición aquí -->
+                <span style="color: var(--border); font-style: italic;">Definition pending.</span>
+              </div>
+            </div>
+
+            <!-- Añadir más definiciones aquí -->
+
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- SECTION: Inclusion criteria -->
+        <div class="method-section" id="sec-criteria">
+          <div class="section-label">02 — Inclusion criteria</div>
+          <h2 class="section-heading">What gets included and what doesn't</h2>
+          <div class="section-body">
+            <div class="placeholder-block">
+              <strong>Pendiente</strong>
+              Criterios de inclusión: umbrales electorales, tipos de liderazgo reconocidos, tratamiento de partidos coaligados, etc.
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- SECTION: Data sources -->
+        <!-- Para añadir fuentes: duplicar .source-item dentro de .source-list -->
+        <div class="method-section" id="sec-sources">
+          <div class="section-label">03 — Data sources</div>
+          <h2 class="section-heading">Where the data comes from</h2>
+          <div class="section-body">
+            <p>Data is drawn from primary sources wherever possible, prioritising official institutional records.</p>
+          </div>
+          <div class="source-list" style="margin-top: 20px;">
+
+            <div class="source-item">
+              <div class="source-name">Source name</div>
+              <div class="source-desc">Brief description of what this source covers and how it is used.</div>
+              <a href="#" class="source-url">https://example.com</a>
+            </div>
+
+            <!-- Añadir más fuentes aquí -->
+
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- SECTION: Update process -->
+        <div class="method-section" id="sec-updates">
+          <div class="section-label">04 — Updates</div>
+          <h2 class="section-heading">How and when the data is updated</h2>
+          <div class="section-body">
+            <div class="placeholder-block">
+              <strong>Pendiente</strong>
+              Frecuencia de actualización, qué desencadena una revisión, significado del campo "last updated".
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- SECTION: Limitations -->
+        <div class="method-section" id="sec-limitations">
+          <div class="section-label">05 — Limitations</div>
+          <h2 class="section-heading">Known limitations and caveats</h2>
+          <div class="section-body">
+            <div class="placeholder-block">
+              <strong>Pendiente</strong>
+              Limitaciones conocidas: líderes interinos, variaciones de nombre entre idiomas, roles en coalición, fuentes con retraso, etc.
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- SECTION: Citation -->
+        <div class="method-section" id="sec-citation">
+          <div class="section-label">06 — Citation</div>
+          <h2 class="section-heading">How to cite this dataset</h2>
+          <div class="section-body">
+            <div class="placeholder-block">
+              <strong>Pendiente</strong>
+              Formato de cita recomendado (APA, BibTeX, etc.).
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /left column -->
+
+      <!-- ===== RIGHT: Table of contents ===== -->
+      <aside>
+        <div class="toc-card">
+          <div class="toc-header">
+            <h3>Contents</h3>
+          </div>
+          <div class="toc-body">
+            <!-- Para añadir entradas: duplicar .toc-link y actualizar href e id de sección -->
+            <a href="#sec-definitions" class="toc-link">01 — Definitions</a>
+            <a href="#sec-criteria" class="toc-link">02 — Inclusion criteria</a>
+            <a href="#sec-sources" class="toc-link">03 — Data sources</a>
+            <a href="#sec-updates" class="toc-link">04 — Updates</a>
+            <a href="#sec-limitations" class="toc-link">05 — Limitations</a>
+            <a href="#sec-citation" class="toc-link">06 — Citation</a>
+          </div>
+        </div>
+      </aside>
+
+    </div><!-- /methodology-grid -->
+
+  </main>
+
+  <!-- ========== Footer ========== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 Political Parties Database. Universitat Pompeu Fabra.</p>
+      <p style="margin-top: 8px;">
+        <a href="about_2.html">About</a> ·
+        <a href="methodology_2.html">Methodology</a> ·
+        <a href="contact_2.html">Contact</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu
+    document.getElementById('menuToggle').addEventListener('click', function () {
+      document.getElementById('mainNav').classList.toggle('mobile-open');
+    });
+
+    // TOC: highlight active section on scroll
+    const sections = document.querySelectorAll('.method-section[id]');
+    const tocLinks = document.querySelectorAll('.toc-link');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(l => l.classList.remove('active'));
+          const active = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>

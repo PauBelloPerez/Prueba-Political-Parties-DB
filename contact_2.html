@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact – Political Parties Database</title>
+  <meta name="description" content="Report data errors, suggest improvements, or describe technical issues." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    @font-face {
+      font-family: 'Excelsor';
+      src: url('ExcelsorBold.woff2') format('woff2'),
+           url('ExcelsorBold.woff') format('woff'),
+           url('ExcelsorBold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ========== Design Tokens ========== */
+    :root {
+      --bg: #F4F0EA;
+      --card: #FDFAF5;
+      --text: #1C1714;
+      --text-secondary: #6B5D52;
+      --muted: #9C8D82;
+      --border: #D8CFC4;
+      --border-light: #EDE7DF;
+
+      --brand: #C8102E;
+      --brand-hover: #C8102E;
+      --brand-light: #F5E4E6;
+
+      --radius: 4px;
+      --radius-lg: 6px;
+      --shadow: 0 1px 4px rgba(28, 23, 20, 0.07), 0 1px 2px rgba(28, 23, 20, 0.05);
+      --shadow-lg: 0 8px 28px rgba(28, 23, 20, 0.12), 0 3px 8px rgba(28, 23, 20, 0.06);
+
+      --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-mono: 'DM Mono', 'Courier New', monospace;
+      --font-upf: 'Excelsor', Georgia, serif;
+      --upf-red: #C8102E;
+
+      --header-height: 64px;
+    }
+
+    /* ========== Reset ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== Header ========== */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      border-top: 4px solid var(--brand);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      height: var(--header-height);
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+    .logo:hover { color: var(--brand); }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--brand);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .logo-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .logo-title strong {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .logo-title span {
+      font-size: 14px;
+      font-family: var(--font-upf);
+      font-weight: 700;
+      color: var(--upf-red);
+      letter-spacing: 0.02em;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .nav-link:hover { color: var(--brand); background: var(--brand-light); }
+    .nav-link.active { color: var(--brand); font-weight: 600; }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 14px; right: 14px;
+      height: 2px;
+      background: var(--brand);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    /* ========== Page layout ========== */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      min-height: calc(100vh - var(--header-height) - 100px);
+    }
+
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--text);
+      max-width: 860px;
+    }
+
+    .page-title {
+      font-size: 44px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .page-description {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 300;
+      line-height: 1.75;
+      max-width: 560px;
+    }
+
+    /* ========== Two-column grid ========== */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 48px;
+      align-items: start;
+      max-width: 1000px;
+    }
+
+    /* ========== Form card ========== */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .form-card-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--text);
+    }
+    .form-card-header h2 {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: #F4F0EA;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .form-card-body {
+      padding: 28px 24px;
+    }
+
+    /* ========== Form elements ========== */
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .input, .select, .textarea {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font);
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .input:focus, .select:focus, .textarea:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: var(--card);
+      box-shadow: 0 0 0 3px var(--brand-light);
+    }
+    .input::placeholder, .textarea::placeholder { color: var(--muted); }
+
+    .select {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239C8D82' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    .textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.6;
+    }
+
+    /* ========== Submit button ========== */
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brand);
+      border: 1px solid var(--brand);
+      color: #fff;
+      padding: 11px 24px;
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--brand-hover); }
+
+    .form-note {
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 18px;
+      font-family: var(--font-mono);
+    }
+    .form-note.success { color: var(--brand); }
+
+    /* ========== Direct email ========== */
+    .direct-email {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-light);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .direct-email a {
+      color: var(--brand);
+      text-decoration: none;
+      font-family: var(--font-mono);
+    }
+    .direct-email a:hover { text-decoration: underline; }
+
+    /* ========== Sidebar ========== */
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: sticky;
+      top: calc(var(--header-height) + 24px);
+    }
+
+    .info-card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--text);
+    }
+    .info-card-header h3 {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: #F4F0EA;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .info-card-body { padding: 20px; }
+
+    .info-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+
+    .checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 20px;
+    }
+    .checklist li {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .checklist li::before {
+      content: '→';
+      color: var(--brand);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .privacy-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    /* ========== Footer ========== */
+    .site-footer {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+    }
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .footer-container a { color: var(--brand); text-decoration: none; }
+    .footer-container a:hover { text-decoration: underline; }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 860px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .info-card { position: static; }
+    }
+
+    @media (max-width: 768px) {
+      .header-container { padding: 0 16px; }
+      .nav {
+        display: none;
+        position: absolute;
+        top: var(--header-height);
+        left: 0; right: 0;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        flex-direction: column;
+        padding: 16px;
+        gap: 4px;
+      }
+      .nav.mobile-open { display: flex; }
+      .nav-link { width: 100%; text-align: left; }
+      .nav-link.active::after { display: none; }
+      .menu-toggle { display: block; }
+      .main-content { padding: 32px 16px 64px; }
+      .page-title { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== Header ========== -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index_2.html" class="logo">
+        <div class="logo-icon">PPDB</div>
+        <div class="logo-title">
+          <strong>Political Parties DB</strong>
+          <span>Universitat Pompeu Fabra</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+
+      <nav class="nav" id="mainNav">
+        <a href="index_2.html" class="nav-link">Data</a>
+        <a href="about_2.html" class="nav-link">About</a>
+        <a href="methodology_2.html" class="nav-link">Methodology</a>
+        <a href="contact_2.html" class="nav-link active">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========== Main ========== -->
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1 class="page-title">Contact</h1>
+      <p class="page-description">
+        Use this form to report data errors, suggest improvements, or flag technical issues.
+      </p>
+    </div>
+
+    <div class="contact-grid">
+
+      <!-- Form -->
+      <div>
+        <div class="form-card">
+          <div class="form-card-header">
+            <h2>Send a message</h2>
+          </div>
+          <div class="form-card-body">
+            <form class="form" id="contactForm" action="https://formspree.io/f/xaqdvbrn" method="POST">
+
+              <div class="field">
+                <label for="name">Name <span style="color:var(--border); font-weight:400;">(optional)</span></label>
+                <input id="name" name="name" class="input" type="text" autocomplete="name" placeholder="Your name" />
+              </div>
+
+              <div class="field">
+                <label for="email">Email <span style="color:var(--border); font-weight:400;">(recommended)</span></label>
+                <input id="email" name="email" class="input" type="email" autocomplete="email" placeholder="you@institution.edu" />
+              </div>
+
+              <div class="field">
+                <label for="topic">Topic</label>
+                <select id="topic" name="topic" class="select">
+                  <option>Data error</option>
+                  <option>Suggestion</option>
+                  <option>Technical issue</option>
+                  <option>Other</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="message">Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  class="textarea"
+                  required
+                  placeholder="Include country, region, party and a source link where possible."
+                ></textarea>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                <button type="submit" class="btn-submit">Send message →</button>
+                <span id="formNote" class="form-note"></span>
+              </div>
+
+            </form>
+
+            <div class="direct-email">
+              Prefer email directly? Write to:
+              <a href="mailto:paubelloperez@gmail.com">paubelloperez@gmail.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside>
+        <div class="info-card">
+          <div class="info-card-header">
+            <h3>What helps us fix it faster</h3>
+          </div>
+          <div class="info-card-body">
+            <div class="info-label">Include if possible</div>
+            <ul class="checklist">
+              <li>Country and region name</li>
+              <li>Party and leader name as shown on the site</li>
+              <li>What is wrong and what the correct value should be</li>
+              <li>A reliable source link (parliament, party site, electoral commission)</li>
+            </ul>
+            <p class="privacy-note">
+              Privacy: your message is used only to respond and improve the dataset. Avoid sharing sensitive personal data.
+            </p>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+  </main>
+
+  <!-- ========== Footer ========== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 Political Parties Database. Universitat Pompeu Fabra.</p>
+      <p style="margin-top: 8px;">
+        <a href="about_2.html">About</a> ·
+        <a href="methodology_2.html">Methodology</a> ·
+        <a href="contact_2.html">Contact</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu
+    document.getElementById('menuToggle').addEventListener('click', function () {
+      document.getElementById('mainNav').classList.toggle('mobile-open');
+    });
+  </script>

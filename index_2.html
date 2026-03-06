@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Political Parties Database - Download Data</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Interactive database to explore and download political party data from Europe, Canada, and Australia" />
+  <meta name="keywords" content="political parties, data download, politics, party leaders" />
+
+  <!-- Fonts & Leaflet -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Excelsor';
+      src: url('ExcelsorBold.woff2') format('woff2'),
+           url('ExcelsorBold.woff') format('woff'),
+           url('ExcelsorBold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ========== CSS Variables ========== */
+    :root {
+      --bg: #F4F0EA;
+      --card: #FDFAF5;
+      --text: #1C1714;
+      --text-secondary: #6B5D52;
+      --muted: #9C8D82;
+      --border: #D8CFC4;
+      --border-light: #EDE7DF;
+      
+      --brand: #C8102E;
+      --brand-hover: #C8102E;
+      --brand-light: #F5E4E6;
+      
+      --chip: #EDE7DF;
+      --chip-selected: #C8102E;
+      --chip-selected-text: #fff;
+      
+      --success: #2D6A4F;
+      --warning: #C77B2A;
+      --danger: #C8102E;
+      
+      --radius: 4px;
+      --radius-lg: 6px;
+      --shadow: 0 1px 4px rgba(28, 23, 20, 0.07), 0 1px 2px rgba(28, 23, 20, 0.05);
+      --shadow-lg: 0 8px 28px rgba(28, 23, 20, 0.12), 0 3px 8px rgba(28, 23, 20, 0.06);
+      
+      --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-mono: 'DM Mono', 'Courier New', monospace;
+      --font-upf: 'Excelsor', Georgia, serif;
+      --upf-red: #C8102E; 
+      
+      --header-height: 64px;
+    }
+
+    /* ========== Global Styles ========== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ========== Header & Navigation ========== */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      border-top: 4px solid var(--brand);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      height: var(--header-height);
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 16px;
+      font-family: var(--font);
+      letter-spacing: 0.01em;
+      transition: color 0.2s;
+    }
+
+    .logo:hover {
+      color: var(--brand);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--brand);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+
+    .logo-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .logo-title strong {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-title span {
+      font-size: 14px;
+      font-family: var(--font-upf);
+      font-weight: 700;
+      color: var(--upf-red);
+      letter-spacing: 0.02em;
+      text-transform: none;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    .nav-link.active {
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 14px;
+      right: 14px;
+      height: 2px;
+      background: var(--brand);
+      border-radius: 0;
+    }
+
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    /* ========== Main Content ========== */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      min-height: calc(100vh - var(--header-height) - 120px);
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--text);
+    }
+
+    .page-title {
+      font-size: 38px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      margin-bottom: 10px;
+      color: var(--text);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+
+    .page-description {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 700px;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ========== Toolbar ========== */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .segmented {
+      display: inline-flex;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 4px;
+    }
+
+    .segmented button {
+      padding: 10px 18px;
+      border: 0;
+      background: transparent;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .segmented button:hover {
+      background: var(--border-light);
+      color: var(--text);
+    }
+
+    .segmented button.active {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: none;
+    }
+
+    #resetView {
+      margin-left: auto;
+    }
+
+    /* ========== Cards & Surfaces ========== */
+    .surface {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    /* ========== Map ========== */
+    #map {
+      height: 65vh;
+      min-height: 500px;
+      border-radius: var(--radius-lg);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Leaflet zoom controls positioning */
+    .leaflet-top.leaflet-right {
+      top: 10px;
+      right: 10px;
+      z-index: 800;
+    }
+
+    /* ========== Sidebar ========== */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      height: 65vh;
+      min-height: 500px;
+    }
+
+    .sidebar .section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .sidebar .section:last-child {
+      border-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-family: var(--font-mono);
+    }
+
+    /* ========== Search & Input ========== */
+    .search {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      transition: all 0.2s;
+      font-family: var(--font);
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: var(--card);
+      box-shadow: 0 0 0 3px var(--brand-light);
+    }
+
+    .input::placeholder {
+      color: var(--muted);
+    }
+
+    /* ========== Country List ========== */
+    .list {
+      overflow: auto;
+      flex: 1;
+      padding: 8px;
+    }
+
+    .country {
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      margin-bottom: 4px;
+    }
+
+    .country:hover {
+      background: var(--border-light);
+      border-color: var(--border);
+    }
+
+    .country.selected {
+      background: var(--brand-light);
+      border-color: var(--brand);
+    }
+
+    .country-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .country-flag {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .country-name {
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .count {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--border-light);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    /* ========== Party Chips ========== */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 200px;
+      overflow: auto;
+      margin-top: 12px;
+      padding: 2px;
+    }
+
+    .chip {
+      padding: 8px 14px;
+      border-radius: 20px;
+      background: var(--chip);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      border: 1.5px solid var(--border);
+      transition: all 0.2s;
+      color: var(--text);
+    }
+
+    .chip:hover {
+      border-color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    .chip.selected {
+      background: var(--chip-selected);
+      color: var(--chip-selected-text);
+      border-color: var(--chip-selected);
+      box-shadow: none;
+    }
+
+    /* ========== Buttons ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+      color: var(--text);
+      font-family: var(--font);
+      white-space: nowrap;
+    }
+
+    .btn:hover:not([disabled]) {
+      background: var(--border-light);
+      border-color: var(--muted);
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+
+    .btn.primary:hover:not([disabled]) {
+      background: var(--brand-hover);
+      box-shadow: none;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .btn.ghost:hover:not([disabled]) {
+      background: var(--border-light);
+    }
+
+    .btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ========== Preview Section ========== */
+    .preview {
+      padding: 20px;
+      margin-top: 24px;
+    }
+
+    .preview-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .preview-title {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: var(--text);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ========== Table ========== */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--text);
+      border-bottom: 2px solid var(--text);
+      padding: 11px 14px;
+      text-align: left;
+      user-select: none;
+      cursor: pointer;
+      font-weight: 500;
+      color: #F4F0EA;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: var(--font-mono);
+      transition: background 0.2s;
+    }
+
+    thead th:hover {
+      background: var(--brand);
+    }
+
+    tbody td {
+      border-top: 1px solid var(--border-light);
+      padding: 12px 14px;
+      color: var(--text);
+    }
+
+    tbody tr:hover {
+      background: var(--border-light);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(0, 0, 0, 0.015);
+    }
+
+    tbody tr:nth-child(even):hover {
+      background: var(--border-light);
+    }
+
+    /* ========== Footer ========== */
+    .footer-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0 0 0;
+      flex-wrap: wrap;
+    }
+
+    #pagination {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* ========== Toast Notifications ========== */
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      display: none;
+      max-width: 400px;
+      animation: slideIn 0.3s ease;
+      z-index: 10000;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* ========== Loader ========== */
+    .loader {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 3px solid var(--border);
+      border-top-color: var(--brand);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ========== Site Footer ========== */
+    .site-footer {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      margin-top: 64px;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .footer-container a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .footer-container a:hover {
+      text-decoration: underline;
+    }
+
+    /* ========== Responsive Design ========== */
+    @media (max-width: 1024px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      #map {
+        height: 50vh;
+        min-height: 400px;
+      }
+
+      .sidebar {
+        height: auto;
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        padding: 0 16px;
+      }
+
+      .nav {
+        display: none;
+        position: absolute;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        flex-direction: column;
+        padding: 16px;
+        gap: 4px;
+      }
+
+      .nav.mobile-open {
+        display: flex;
+      }
+
+      .nav-link {
+        width: 100%;
+        text-align: left;
+      }
+
+      .nav-link.active::after {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .main-content {
+        padding: 24px 16px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .segmented {
+        justify-content: center;
+      }
+
+      #resetView {
+        margin-left: 0;
+      }
+
+      .grid {
+        gap: 16px;
+      }
+
+      .preview-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 16px;
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+
+      .segmented button {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ========== Header ========== -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index_2.html" class="logo">
+        <div class="logo-icon">PPDB</div>
+        <div class="logo-title">
+          <strong>Political Parties DB</strong>
+          <span>Universitat Pompeu Fabra</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        ☰
+      </button>
+
+      <nav class="nav" id="mainNav">
+        <a href="index_2.html" class="nav-link active">Data</a>
+        <a href="about_2.html" class="nav-link">About</a>
+        <a href="methodology_2.html" class="nav-link">Methodology</a>
+        <a href="contact_2.html" class="nav-link">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========== Main Content ========== -->
+  <main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Political Party Database</h1>
+      <p class="page-description">
+        Explore and download comprehensive data on political parties across Europe, Canada, and Australia. 
+        Select countries and parties to view detailed information and export data.
+      </p>
+    </div>
+
+    <!-- Map Selector Toolbar -->
+    <div class="toolbar">
+      <div class="segmented" role="tablist" aria-label="Map scopes">
+        <button class="seg active" data-map="Europe" role="tab" aria-selected="true"><img src="EU_Flag.svg.webp" alt="EU" style="height:1em; vertical-align:middle; margin-right:4px; border-radius:3px;"> Europe</button>
+        <button class="seg" data-map="Canada" role="tab"><img src="CA_Flag.png" alt="CA" style="height:1em; vertical-align:middle; margin-right:4px; border-radius:3px;"> Canada</button>
+        <button class="seg" data-map="Australia" role="tab"><img src="AU_Flag.svg" alt="AU" style="height:1em; vertical-align:middle; margin-right:4px; border-radius:3px;"> Australia</button>
+      </div>
+      <button id="resetView" class="btn ghost" title="Reset map view">
+        <span>↺</span> Reset View
+      </button>
+    </div>
+
+    <!-- Map & Sidebar Grid -->
+    <div class="surface grid">
+      <!-- Interactive Map -->
+      <div id="map"></div>
+
+      <!-- Country Selection Sidebar -->
+      <aside class="sidebar">
+        <div class="section">
+          <label class="section-title" for="countrySearch">Search Countries</label>
+          <div class="search">
+            <input 
+              id="countrySearch" 
+              class="input" 
+              type="search" 
+              placeholder="Type to search..." 
+              aria-label="Search country"
+            />
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button id="btnSelectAllCountries" class="btn ghost">Select All</button>
+            <button id="btnClearCountries" class="btn ghost">Clear</button>
+          </div>
+        </div>
+        <div class="list" id="countryList" aria-label="Countries list"></div>
+      </aside>
+    </div>
+
+    <!-- Data Preview & Download Section -->
+    <div class="surface preview" aria-live="polite">
+      <div class="preview-header">
+        <div>
+          <h2 class="preview-title">Preview and Download Data</h2>
+          <span id="selectedCountry" class="hint"></span>
+        </div>
+        <div id="dataStatus" class="hint" style="display: flex; align-items: center; gap: 8px;"></div>
+      </div>
+
+      <!-- Party Selection -->
+      <div class="section" style="padding: 0 0 16px 0; border: 0;">
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <label class="hint" style="font-weight: 700;">Filter by parties:</label>
+          <button id="selectAll" class="btn ghost" disabled>Select All</button>
+          <button id="clearAll" class="btn ghost" disabled>Clear</button>
+          <input 
+            id="partySearch" 
+            class="input" 
+            style="max-width: 300px;" 
+            type="search" 
+            placeholder="Search parties..." 
+            aria-label="Filter parties"
+          />
+        </div>
+        <div class="chips" id="partyList"></div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="table-wrap" id="previewWrap" style="display: none;">
+        <table id="previewTable" aria-label="Party data by country">
+          <thead>
+            <tr>
+              <th data-key="Country">Country ▾</th>
+              <th data-key="Region">Region</th>
+              <th data-key="Party">Party</th>
+              <th data-key="Party leader">Party Leader</th>
+              <th data-key="Since">Since</th>
+              <th data-key="Until">Until</th>
+              <th data-key="Gender">Gender</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Footer Controls -->
+      <div class="footer-controls">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="btnPreview" class="btn" disabled>
+            <span></span> Preview Data
+          </button>
+          <button id="btnDownload" class="btn primary" disabled>
+            <span></span> Download data
+          </button>
+        </div>
+        <div id="pagination"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== Site Footer ========== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 Political Parties Database. Universitat Pompeu Fabra.</p>
+      <p style="margin-top: 8px;">
+        <a href="about_2.html">About</a> · 
+        <a href="methodology_2.html">Methodology</a> · 
+        <a href="contact_2.html">Contact</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Leaflet Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Application JavaScript -->
+  <script>
+    (function() {
+      'use strict';
+
+      // ========== Utility Functions ==========
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+      function showToast(msg) {
+        const toast = $('#toast');
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2600);
+      }
+
+      // ========== Mobile Menu Toggle ==========
+      const menuToggle = $('#menuToggle');
+      const mainNav = $('#mainNav');
+      
+      menuToggle.addEventListener('click', () => {
+        mainNav.classList.toggle('mobile-open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.header-container')) {
+          mainNav.classList.remove('mobile-open');
+        }
+      });
+
+      // ========== Map Configuration ==========
+      const maps = [
+        {
+          name: 'Europe',
+          file: 'europe.geojson',
+          prop: 'NAME',
+          bounds: [[20, -40], [72, 50]],
+          zoom: 4,
+          style: { color: '#0f172a', weight: 1, fillColor: '#C8102E', fillOpacity: 0.5 },
+          filter: f => ['Austria', 'France', 'Germany', 'Italy', 'Portugal', 'Spain', 'Switzerland', 'United Kingdom'].includes(f.properties.NAME)
+        },
+        {
+          name: 'Canada',
+          file: 'ca.json',
+          prop: 'name',
+          bounds: [[41, -141], [83, -52]],
+          zoom: 3,
+          style: { color: '#0f172a', weight: 1, fillColor: '#C8102E', fillOpacity: 0.5 }
+        },
+        {
+          name: 'Australia',
+          file: 'au.json',
+          prop: 'name',
+          bounds: [[-44, 112], [-10, 154]],
+          zoom: 4,
+          style: { color: '#0f172a', weight: 1, fillColor: '#C8102E', fillOpacity: 0.5 }
+        }
+      ];
+
+      const allCountries = ['Austria', 'France', 'Germany', 'Italy', 'Portugal', 'Spain', 'Switzerland', 'United Kingdom', 'Canada', 'Australia'];
+
+      // ========== State Variables ==========
+      let currentMapIdx = 0;
+      let countriesLayer;
+      let selectedCountries = new Set();
+      let partiesDataMain = [];
+      let partiesDataCombined = [];
+      let countryIndex = new Map();
+      let sortKey = 'Country';
+      let sortAsc = true;
+      let currentPage = 1;
+      let rowsPerPage = 25;
+
+      // ========== Map Initialization ==========
+      const map = L.map('map', { attributionControl: false }).setView([50, 10], 4);
+      L.control.zoom({ position: 'topright' }).addTo(map);
+
+      $('#resetView').addEventListener('click', () => fitToSelectionOrScope());
+
+      // ========== Scope Segmented Control ==========
+      const segs = $$('.segmented .seg');
+      segs.forEach((b, idx) => b.addEventListener('click', () => {
+        currentMapIdx = idx;
+        updateSegs();
+        loadMap();
+      }));
+
+      function updateSegs() {
+        segs.forEach((b, i) => b.classList.toggle('active', i === currentMapIdx));
+      }
+      updateSegs();
+
+      // ========== Country List ==========
+      const countryListEl = $('#countryList');
+      const countrySearch = $('#countrySearch');
+
+      $('#btnSelectAllCountries').addEventListener('click', () => {
+        allVisibleCountries().forEach(c => selectedCountries.add(c));
+        syncUIAfterCountryChange(true);
+      });
+
+      $('#btnClearCountries').addEventListener('click', () => {
+        selectedCountries.clear();
+        syncUIAfterCountryChange(true);
+      });
+
+      countrySearch.addEventListener('input', () => renderCountryList());
+
+      function renderCountryList() {
+        const q = countrySearch.value.trim().toLowerCase();
+        countryListEl.innerHTML = '';
+        const items = allVisibleCountries().filter(c => c.toLowerCase().includes(q));
+
+        items.forEach(name => {
+          const row = document.createElement('div');
+          row.className = 'country' + (selectedCountries.has(name) ? ' selected' : '');
+          row.tabIndex = 0;
+          row.setAttribute('role', 'button');
+
+          const left = document.createElement('div');
+          left.className = 'country-left';
+
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = selectedCountries.has(name);
+          cb.setAttribute('aria-label', `Select ${name}`);
+
+          const span = document.createElement('span');
+          span.textContent = name;
+
+          left.appendChild(cb);
+          left.appendChild(span);
+
+          const cnt = document.createElement('span');
+          cnt.className = 'count';
+          cnt.textContent = (countryIndex.get(name) || 0) + ' rows';
+
+          row.appendChild(left);
+          row.appendChild(cnt);
+
+          const toggle = () => {
+            if (cb.checked) {
+              selectedCountries.add(name);
+            } else {
+              selectedCountries.delete(name);
+            }
+            syncUIAfterCountryChange();
+          };
+
+          cb.addEventListener('click', e => {
+            e.stopPropagation();
+            toggle();
+          });
+
+          row.addEventListener('click', () => {
+            cb.checked = !cb.checked;
+            toggle();
+          });
+
+          row.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              cb.checked = !cb.checked;
+              toggle();
+            }
+          });
+
+          countryListEl.appendChild(row);
+        });
+      }
+
+      function allVisibleCountries() {
+        return allCountries.slice();
+      }
+
+      // ========== Party Chips ==========
+      const partyListEl = $('#partyList');
+      const partySearch = $('#partySearch');
+      const btnSelectAll = $('#selectAll');
+      const btnClearAll = $('#clearAll');
+
+      partySearch.addEventListener('input', () => buildChips());
+      btnSelectAll.addEventListener('click', () => toggleAllChips(true));
+      btnClearAll.addEventListener('click', () => toggleAllChips(false));
+
+      function toggleAllChips(val) {
+        $$('.chip', partyListEl).forEach(ch => ch.classList.toggle('selected', val));
+        currentPage = 1;
+        if ($('#previewWrap').style.display !== 'none') refreshPreview();
+      }
+
+      // ========== Preview + Export ==========
+      const selectedCountrySpan = $('#selectedCountry');
+      const btnPreview = $('#btnPreview');
+      const btnDownload = $('#btnDownload');
+      const previewWrap = $('#previewWrap');
+      const pagination = $('#pagination');
+
+      btnPreview.addEventListener('click', () => {
+        previewWrap.style.display = (previewWrap.style.display === 'none') ? 'block' : 'none';
+        if (previewWrap.style.display === 'block') refreshPreview();
+      });
+
+      btnDownload.addEventListener('click', downloadExcel);
+
+      // ========== Sorting ==========
+      $$('#previewTable thead th').forEach(th => {
+        th.addEventListener('click', () => {
+          const key = th.getAttribute('data-key');
+          if (sortKey === key) sortAsc = !sortAsc;
+          else {
+            sortKey = key;
+            sortAsc = true;
+          }
+          refreshPreview();
+          $$('#previewTable thead th').forEach(h => h.textContent = h.textContent.replace(/[▴▾]\s*$/, ''));
+          th.textContent = th.textContent.replace(/[▴▾]\s*$/, '') + (sortAsc ? ' ▾' : ' ▴');
+        });
+      });
+
+      // ========== Data Loading ==========
+      setStatus('Loading data', true);
+
+      Papa.parse('DataPartiesPrueba.csv', {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: res => {
+          partiesDataMain = res.data.map(r => ({
+            Country: r.COUNTRY,
+            Region: '',
+            Party: r.PTYNAME,
+            'Party leader': r.CR20PPGLDR,
+            Since: '',
+            Until: ''
+          }));
+          setStatus('General CSV loaded');
+          maybeMerge();
+        },
+        error: () => showToast('Error loading data')
+      });
+
+      Papa.parse('DataAustralia.csv', {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: res => {
+          const aus = res.data.map(r => ({
+            Country: r.Country,
+            Region: r.Region,
+            Party: r.Party,
+            'Party leader': r['Party leader'],
+            Since: r['Year became leader'] || r['Since'] || '',
+            Until: r['Year ended as leader'] || r['Until'] || ''
+          }));
+          partiesDataCombined = partiesDataMain.concat(aus);
+          hydrateIndex(partiesDataCombined);
+          setStatus('All CSVs loaded');
+          renderCountryList();
+        },
+        error: () => showToast('Error loading DataAustralia.csv')
+      });
+
+      function maybeMerge() {
+        if (!partiesDataCombined.length) {
+          partiesDataCombined = partiesDataMain.slice();
+          hydrateIndex(partiesDataCombined);
+          renderCountryList();
+        }
+      }
+
+      function hydrateIndex(arr) {
+        countryIndex = new Map();
+        arr.forEach(r => {
+          countryIndex.set(r.Country, (countryIndex.get(r.Country) || 0) + 1);
+        });
+      }
+
+      // ========== Map Loading ==========
+      loadMap();
+
+      function loadMap() {
+        const cfg = maps[currentMapIdx];
+        map.setMaxBounds(cfg.bounds);
+        if (countriesLayer) countriesLayer.remove();
+        map.setView([(cfg.bounds[0][0] + cfg.bounds[1][0]) / 2, (cfg.bounds[0][1] + cfg.bounds[1][1]) / 2], cfg.zoom);
+
+        fetch(cfg.file)
+          .then(r => r.json())
+          .then(data => {
+            let feats = data.features.filter(f => f.properties && typeof f.properties[cfg.prop] !== 'undefined');
+            if (cfg.filter) feats = feats.filter(cfg.filter);
+
+            countriesLayer = L.geoJSON({
+              type: 'FeatureCollection',
+              features: feats
+            }, {
+              style: (f) => {
+                const base = cfg.style;
+                const name = f.properties[cfg.prop];
+                const isSel = selectedCountries.has(name);
+                return Object.assign({}, base, {
+                  weight: isSel ? 3 : 1,
+                  fillOpacity: isSel ? 0.65 : 0.5
+                });
+              },
+              onEachFeature: (f, l) => {
+                const name = f.properties[cfg.prop];
+                l.on('click', () => { toggleCountrySelection(name); });
+                l.on('mouseover', () => l.setStyle({ weight: 3 }));
+                l.on('mouseout', () => { if (!selectedCountries.has(name)) l.setStyle({ weight: 1 }); });
+              }
+            }).addTo(map);
+          })
+          .catch(() => showToast('Failed to load GeoJSON for ' + cfg.name));
+      }
+
+      function toggleCountrySelection(name) {
+        if (selectedCountries.has(name)) selectedCountries.delete(name);
+        else selectedCountries.add(name);
+        syncUIAfterCountryChange(true);
+      }
+
+      function syncUIAfterCountryChange(fit) {
+        renderCountryList();
+        if (countriesLayer) {
+          countriesLayer.eachLayer(l => {
+            const cfg = maps[currentMapIdx];
+            const name = l.feature.properties[cfg.prop];
+            l.setStyle({
+              weight: selectedCountries.has(name) ? 3 : 1,
+              fillOpacity: selectedCountries.has(name) ? 0.65 : 0.5
+            });
+          });
+        }
+
+        const hasSelection = selectedCountries.size > 0;
+        $('#btnPreview').disabled = !hasSelection;
+        $('#btnDownload').disabled = !hasSelection;
+        $('#selectAll').disabled = !hasSelection;
+        $('#clearAll').disabled = !hasSelection;
+
+        buildChips();
+        if (fit) fitToSelectionOrScope();
+        updateSelectedIndicator();
+        refreshPreview();
+      }
+
+      function fitToSelectionOrScope() {
+        const cfg = maps[currentMapIdx];
+        if (countriesLayer && selectedCountries.size > 0) {
+          let bounds = null;
+          countriesLayer.eachLayer(l => {
+            const name = l.feature.properties[cfg.prop];
+            if (selectedCountries.has(name)) bounds = bounds ? bounds.extend(l.getBounds()) : l.getBounds();
+          });
+          if (bounds) {
+            try {
+              map.fitBounds(bounds.pad(0.2));
+            } catch (_) {}
+          } else {
+            map.setView([(cfg.bounds[0][0] + cfg.bounds[1][0]) / 2, (cfg.bounds[0][1] + cfg.bounds[1][1]) / 2], cfg.zoom);
+          }
+        } else {
+          map.setView([(cfg.bounds[0][0] + cfg.bounds[1][0]) / 2, (cfg.bounds[0][1][1] + cfg.bounds[1][1]) / 2], cfg.zoom);
+        }
+      }
+
+      function updateSelectedIndicator() {
+        const span = $('#selectedCountry');
+        if (selectedCountries.size === 0) span.textContent = '';
+        else if (selectedCountries.size === 1) span.textContent = Array.from(selectedCountries)[0];
+        else span.textContent = selectedCountries.size + ' countries';
+      }
+
+      function buildChips() {
+        const partyListEl = $('#partyList');
+        partyListEl.innerHTML = '';
+        if (selectedCountries.size === 0) return;
+
+        const q = $('#partySearch').value.trim().toLowerCase();
+        const selCountries = new Set(selectedCountries);
+        const union = new Set();
+        partiesDataCombined.forEach(r => {
+          if (selCountries.has(r.Country)) union.add(r.Party);
+        });
+
+        Array.from(union).filter(p => p.toLowerCase().includes(q)).sort().forEach(p => {
+          const c = document.createElement('button');
+          c.type = 'button';
+          c.className = 'chip selected';
+          c.textContent = p;
+          c.setAttribute('aria-pressed', 'true');
+          c.onclick = () => {
+            c.classList.toggle('selected');
+            c.setAttribute('aria-pressed', c.classList.contains('selected'));
+            currentPage = 1;
+            if ($('#previewWrap').style.display !== 'none') refreshPreview();
+          };
+          partyListEl.appendChild(c);
+        });
+      }
+
+      function refreshPreview() {
+        const tbody = $('#previewTable tbody');
+        tbody.innerHTML = '';
+        if (selectedCountries.size === 0) {
+          $('#previewWrap').style.display = 'none';
+          return;
+        }
+        $('#previewWrap').style.display = 'block';
+
+        const selParties = $$('.chip.selected', $('#partyList')).map(c => c.textContent);
+        let rows = partiesDataCombined.filter(r => selectedCountries.has(r.Country) && (selParties.length ? selParties.includes(r.Party) : true));
+
+        rows.sort((a, b) => {
+          const VA = (a[sortKey] || '').toString();
+          const VB = (b[sortKey] || '').toString();
+          if (!isNaN(+VA) && !isNaN(+VB)) return (sortAsc ? +VA - +VB : +VB - +VA);
+          return sortAsc ? VA.localeCompare(VB) : VB.localeCompare(VA);
+        });
+
+        const total = rows.length;
+        const totalPages = Math.max(1, Math.ceil(total / rowsPerPage));
+        if (currentPage > totalPages) currentPage = totalPages;
+        const start = (currentPage - 1) * rowsPerPage;
+        const pageRows = rows.slice(start, start + rowsPerPage);
+
+        pageRows.forEach(r => {
+          const tr = document.createElement('tr');
+          ['Country', 'Region', 'Party', 'Party leader', 'Since', 'Until'].forEach(k => {
+            const td = document.createElement('td');
+            td.textContent = r[k] || '';
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+
+        renderPagination(totalPages);
+      }
+
+      function renderPagination(totalPages) {
+        const pagination = $('#pagination');
+        pagination.innerHTML = '';
+        const prev = document.createElement('button');
+        prev.className = 'btn';
+        prev.textContent = '« Previous';
+        prev.disabled = currentPage === 1;
+        prev.onclick = () => {
+          currentPage--;
+          refreshPreview();
+        };
+        const next = document.createElement('button');
+        next.className = 'btn';
+        next.textContent = 'Next »';
+        next.disabled = currentPage === totalPages;
+        next.onclick = () => {
+          currentPage++;
+          refreshPreview();
+        };
+        pagination.appendChild(prev);
+        for (let p = 1; p <= totalPages; p++) {
+          const b = document.createElement('button');
+          b.className = 'btn ghost';
+          b.textContent = p;
+          if (p === currentPage) b.style.borderColor = 'var(--brand)';
+          b.onclick = () => {
+            currentPage = p;
+            refreshPreview();
+          };
+          pagination.appendChild(b);
+        }
+        pagination.appendChild(next);
+      }
+
+      function downloadExcel() {
+        const selParties = $$('.chip.selected', $('#partyList')).map(c => c.textContent);
+        const data = partiesDataCombined.filter(r => selectedCountries.has(r.Country) && (selParties.length ? selParties.includes(r.Party) : true))
+          .map(r => ({
+            Country: r.Country,
+            Region: r.Region,
+            Party: r.Party,
+            'Party leader': r['Party leader'],
+            Since: r.Since,
+            Until: r.Until
+          }));
+        if (!data.length) {
+          showToast('There are no rows to export');
+          return;
+        }
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Parties');
+        const label = selectedCountries.size === 1 ? Array.from(selectedCountries)[0] : selectedCountries.size + 'countries';
+        XLSX.writeFile(wb, `Parties_${label}.xlsx`);
+      }
+
+      function setStatus(msg, loading) {
+        const el = $('#dataStatus');
+        el.innerHTML = '';
+        if (loading) {
+          const spn = document.createElement('span');
+          spn.className = 'loader';
+          el.appendChild(spn);
+        }
+        el.appendChild(document.createTextNode(msg || ''));
+      }
+
+      // ========== Restore Last Selection ==========
+      const last = localStorage.getItem('lastCountries');
+      if (last) {
+        try {
+          selectedCountries = new Set(JSON.parse(last));
+        } catch (_) {}
+      }
+      renderCountryList();
+      updateSelectedIndicator();
+
+      // ========== Keyboard Help on Table Headers ==========
+      $$('#previewTable thead th').forEach(th => {
+        th.setAttribute('tabindex', '0');
+        th.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            th.click();
+          }
+        });
+      });
+
+      // ========== Persist Selection ==========
+      window.addEventListener('beforeunload', () => {
+        localStorage.setItem('lastCountries', JSON.stringify(Array.from(selectedCountries)));
+      });
+    })();
+  </script>
+</body>
+</html>
