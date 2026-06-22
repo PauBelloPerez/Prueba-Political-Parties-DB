@@ -1574,9 +1574,15 @@
         const q = $('#partySearch').value.trim().toLowerCase();
         const selCountries = new Set(selectedCountries);
         const groups = new Map();
+        const familyCountries = new Map();
         partiesDataCombined.forEach(r => {
           const country = r.Country;
           const family = r['Party family'] || r.Party;
+          if (selCountries.has(country) && family) {
+            const familyKey = String(family).trim().toLowerCase();
+            if (!familyCountries.has(familyKey)) familyCountries.set(familyKey, new Set());
+            familyCountries.get(familyKey).add(country);
+          }
           if (selCountries.has(country) && family && matchesSearch(r, q)) {
             const key = `${country}\u0000${family}`;
             groups.set(key, { country, family });
@@ -1591,7 +1597,9 @@
           const c = document.createElement('button');
           c.type = 'button';
           c.className = 'chip selected';
-          c.textContent = selectedCountries.size > 1
+          const familyKey = String(group.family).trim().toLowerCase();
+          const hasDuplicateName = (familyCountries.get(familyKey) || new Set()).size > 1;
+          c.textContent = hasDuplicateName
             ? `${group.family} (${group.country})`
             : group.family;
           c.dataset.country = group.country;
