@@ -1042,13 +1042,13 @@
             <tr>
               <th data-key="Country">Country ▾</th>
               <th data-key="Region">Region</th>
-              <th data-key="Party">Party</th>
+              <th data-key="Party">Regional Party Name</th>
               <th data-key="Party leader">Party Leader</th>
               <th data-key="Year became leader">Since</th>
               <th data-key="Year ended as leader">Until</th>
               <th data-key="Female leader (0= male; 1 = female)">Female</th>
               <th data-key="Interim leader (0= No; 1 =Yes)">Interim</th>
-              <th data-key="Party family">Party family</th>
+              <th data-key="Party family">National Party Name</th>
               <th data-key="Comments">Comments</th>
             </tr>
           </thead>
@@ -1730,13 +1730,13 @@
           .map(r => ({
             Country: r.Country,
             Region: r.Region,
-            Party: r.Party,
+            'Regional Party Name': r.Party,
             'Party leader': r['Party leader'],
             'Year became leader': numericOrBlank(r['Year became leader']),
             'Year ended as leader': numericOrBlank(r['Year ended as leader']),
             'Female leader (0= male; 1 = female)': numericOrBlank(r['Female leader (0= male; 1 = female)']),
             'Interim leader (0= No; 1 =Yes)': numericOrBlank(r['Interim leader (0= No; 1 =Yes)']),
-            'Party family': r['Party family'],
+            'National Party Name': r['Party family'],
             Comments: r.Comments
           }));
         if (!data.length) {
