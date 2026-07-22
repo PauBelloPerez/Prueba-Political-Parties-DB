@@ -1,0 +1,113 @@
+Country,Region,Comments,Party,Interim leader (0= No; 1 =Yes),Year became leader,Year ended as leader,Party leader,Female leader (0= male; 1 = female),Party family
+Australia,Australian Capital Territory,,Labor,0,1987,1996,Rosemary Follett,1,Labor
+Australia,Australian Capital Territory,,Labor,0,1996,1997,Andrew Whitecross,0,Labor
+Australia,Australian Capital Territory,,Labor,0,1997,1998,Wayne Berry,0,Labor
+Australia,Australian Capital Territory,,Labor,0,1998,2011,Jon Stanhope,0,Labor
+Australia,Australian Capital Territory,,Labor,0,2011,2014,Katy Gallagher,1,Labor
+Australia,Australian Capital Territory,,Labor,0,2014,,Andrew Barr,0,Labor
+Australia,New South Wales,,Labor,0,1939,1947,William McKell,0,Labor
+Australia,New South Wales,,Labor,0,1947,1952,James McGirr,0,Labor
+Australia,New South Wales,,Labor,0,1952,1959,Joseph Cahill,0,Labor
+Australia,New South Wales,,Labor,0,1959,1964,Robert Heffron,0,Labor
+Australia,New South Wales,,Labor,0,1964,1968,Jack Renshaw,0,Labor
+Australia,New South Wales,,Labor,0,1968,1973,Patrick Hills,0,Labor
+Australia,New South Wales,,Labor,0,1973,1986,Nevill Wran,0,Labor
+Australia,New South Wales,,Labor,0,1986,1988,Barrie Unsworth,0,Labor
+Australia,New South Wales,,Labor,0,1988,2005,Bob Carr,0,Labor
+Australia,New South Wales,,Labor,0,2005,2008,Morris Iemma,0,Labor
+Australia,New South Wales,,Labor,0,2008,2009,Nathan Rees,0,Labor
+Australia,New South Wales,,Labor,0,2009,2011,Kristina Keneally,1,Labor
+Australia,New South Wales,,Labor,0,2011,2014,John Robertson,0,Labor
+Australia,New South Wales,,Labor,1,2014,2015,Linda Burney,1,Labor
+Australia,New South Wales,,Labor,0,2015,2018,Luke Foley,0,Labor
+Australia,New South Wales,,Labor,0,2018,2019,Michael Daley,0,Labor
+Australia,New South Wales,,Labor,1,2019,2019,Penny Sharpe,1,Labor
+Australia,New South Wales,,Labor,0,2019,2021,Jodi McKay,1,Labor
+Australia,New South Wales,,Labor,1,2021,2021,Adam Searle,0,Labor
+Australia,New South Wales,,Labor,0,2021,,Chris Minns,0,Labor
+Australia,Northern Territory,,Labor,0,1977,1981,Jon Isaacs,0,Labor
+Australia,Northern Territory,,Labor,0,1981,1986,Bob Collins,0,Labor
+Australia,Northern Territory,,Labor,0,1986,1990,Terry Smith,0,Labor
+Australia,Northern Territory,,Labor,0,1990,1996,Brian Ede,0,Labor
+Australia,Northern Territory,,Labor,0,1996,1999,Maggie Hickey,1,Labor
+Australia,Northern Territory,,Labor,0,1999,2007,Clare Martin,1,Labor
+Australia,Northern Territory,,Labor,0,2007,2012,Paul Henderson,0,Labor
+Australia,Northern Territory,,Labor,0,2012,2015,Delia Lawrie,1,Labor
+Australia,Northern Territory,,Labor,0,2015,2022,Michael Gunner,0,Labor
+Australia,Northern Territory,,Labor,0,2022,2023,Natasha Fyles,1,Labor
+Australia,Northern Territory,,Labor,0,2023,2024,Eva Lawler,1,Labor
+Australia,Northern Territory,,Labor,0,2024,,Selena Uibo,1,Labor
+Australia,Queensland,,Labor,0,1942,1946,Frank Cooper,0,Labor
+Australia,Queensland,,Labor,0,1946,1952,Ned Hanlon,0,Labor
+Australia,Queensland,,Labor,0,1952,1957,Vince Gair,0,Labor
+Australia,Queensland,,Labor,0,1957,1958,Leslie Good,1,Labor
+Australia,Queensland,,Labor,0,1958,1958,James Donald,0,Labor
+Australia,Queensland,,Labor,0,1958,1966,John Duggan,0,Labor
+Australia,Queensland,,Labor,0,1966,1974,Jack Houston,0,Labor
+Australia,Queensland,,Labor,0,1974,1974,Perc Tucker,0,Labor
+Australia,Queensland,,Labor,0,1974,1978,Tom Burns,0,Labor
+Australia,Queensland,,Labor,0,1978,1982,Ed Casey,0,Labor
+Australia,Queensland,,Labor,0,1982,1984,Keith Wright,0,Labor
+Australia,Queensland,,Labor,0,1984,1988,Nev Warburton,0,Labor
+Australia,Queensland,,Labor,0,1988,1996,Wayne Goss,0,Labor
+Australia,Queensland,,Labor,0,1996,2007,Peter Beattie,0,Labor
+Australia,Queensland,,Labor,0,2007,2012,Anna Bligh,1,Labor
+Australia,Queensland,,Labor,0,2012,2023,Annastacia Palaszczuk,1,Labor
+Australia,Queensland,,Labor,0,2023,,Steven Miles,0,Labor
+Australia,South Australia,,Labor,0,1938,1949,Robert Richards,0,Labor
+Australia,South Australia,,Labor,0,1949,1960,Mick O'Halloran,0,Labor
+Australia,South Australia,,Labor,0,1960,1967,Frank Walsh,0,Labor
+Australia,South Australia,,Labor,0,1967,1979,Donald Dunstan,0,Labor
+Australia,South Australia,,Labor,0,1979,1979,Des Corcoran,0,Labor
+Australia,South Australia,,Labor,0,1979,1992,John Bannon,0,Labor
+Australia,South Australia,,Labor,0,1992,1994,Lynn Arnold,0,Labor
+Australia,South Australia,,Labor,0,1994,2011,Mike Rann,0,Labor
+Australia,South Australia,,Labor,0,2011,2011,Jay Weatherill,0,Labor
+Australia,South Australia,,Labor,0,2018,,Peter Malinauskas,0,Labor
+Australia,Tasmania,,Labor,0,1939,1958,Robert Cosgrove,0,Labor
+Australia,Tasmania,,Labor,0,1958,1975,Eric Reece,0,Labor
+Australia,Tasmania,,Labor,0,1958,1975,Eric Reece,0,Labor
+Australia,Tasmania,,Labor,0,1975,1977,Bill Neilson,0,Labor
+Australia,Tasmania,,Labor,0,1977,1981,Douglas Lowe,0,Labor
+Australia,Tasmania,,Labor,0,1981,1982,Harry Holgate,0,Labor
+Australia,Tasmania,,Labor,0,1982,1986,Ken Wriedt,0,Labor
+Australia,Tasmania,,Labor,0,1986,1988,Neil Batt,0,Labor
+Australia,Tasmania,,Labor,0,1988,1997,Michael Field,0,Labor
+Australia,Tasmania,,Labor,0,1997,2004,Jim Bacon,0,Labor
+Australia,Tasmania,,Labor,0,2004,2008,Paul Lennon,0,Labor
+Australia,Tasmania,,Labor,0,2008,2011,David Bartlett,0,Labor
+Australia,Tasmania,,Labor,0,2011,2014,Lara Giddings,1,Labor
+Australia,Tasmania,,Labor,0,2014,2017,Bryan Green,0,Labor
+Australia,Tasmania,,Labor,0,2017,2021,Rebecca White,1,Labor
+Australia,Tasmania,,Labor,0,2021,2021,David O'Byrne,0,Labor
+Australia,Tasmania,,Labor,0,2021,2024,Rebecca White,1,Labor
+Australia,Tasmania,,Labor,0,2024,2025,Dean Winter,0,Labor
+Australia,Tasmania,,Labor,0,2025,,Josh Willie,0,Labor
+Australia,Victoria,,Labor,0,1937,1957,John Cane (senior),0,Labor
+Australia,Victoria,,Labor,0,1957,1958,Erni Shepherd,0,Labor
+Australia,Victoria,,Labor,0,1958,1967,Clive Stonham,0,Labor
+Australia,Victoria,,Labor,0,1967,1977,Clyde Holding,0,Labor
+Australia,Victoria,,Labor,0,1977,1981,Frank Wilkings,0,Labor
+Australia,Victoria,,Labor,0,1981,1990,John Cane,0,Labor
+Australia,Victoria,,Labor,0,1990,1993,Joan Kirner,1,Labor
+Australia,Victoria,,Labor,0,1993,1993,Jim Kennan,0,Labor
+Australia,Victoria,,Labor,0,1993,1999,John Brumby,0,Labor
+Australia,Victoria,,Labor,0,1999,2007,Steve Bracks,0,Labor
+Australia,Victoria,,Labor,0,2007,2010,John Brumby,0,Labor
+Australia,Victoria,,Labor,0,2010,2023,Daniel Andrews,0,Labor
+Australia,Victoria,,Labor,0,2023,,Jacinta Allan,1,Labor
+Australia,Western Australia,,Labor,0,1945,1951,Frank Wise,0,Labor
+Australia,Western Australia,,Labor,0,1951,1966,Albert Hawke,0,Labor
+Australia,Western Australia,,Labor,0,1967,1976,John Tonkin,0,Labor
+Australia,Western Australia,,Labor,0,1976,1978,Colin Jamieson,0,Labor
+Australia,Western Australia,,Labor,0,1978,1981,Ron Davies,0,Labor
+Australia,Western Australia,,Labor,0,1981,1988,Brian Burke,0,Labor
+Australia,Western Australia,,Labor,0,1988,1990,Peter McCallum Dowding,0,Labor
+Australia,Western Australia,,Labor,0,1990,1994,Carmen Lawrence,1,Labor
+Australia,Western Australia,,Labor,0,1994,1994,Ian Taylor,0,Labor
+Australia,Western Australia,,Labor,0,1994,1996,Jim McGinty,0,Labor
+Australia,Western Australia,,Labor,0,1996,2006,Geoff Gallop,0,Labor
+Australia,Western Australia,,Labor,0,2006,2008,Alan Carpenter,0,Labor
+Australia,Western Australia,,Labor,0,2008,2012,Eric Ripper,0,Labor
+Australia,Western Australia,,Labor,0,2012,2023,Mark McGowan,0,Labor
+Australia,Western Australia,,Labor,0,2023,,Roger Cook,0,Labor

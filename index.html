@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Regional Party Leadership Database - Download Data</title>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GM89ZY3Y59"></script>
   <script>
@@ -12,22 +11,21 @@
     gtag('js', new Date());
     gtag('config', 'G-GM89ZY3Y59');
   </script>
-  
+
   <!-- SEO Meta Tags -->
-<meta name="description" content="Base de datos interactiva de partidos políticos de Europa, Canadá y Australia. Descarga datos sobre líderes, ideología y resultados electorales. Universitat Pompeu Fabra." />
-<meta name="keywords" content="Regional Party Leadership Database, partidos políticos, European parties, party leaders, electoral data, UPF, comparative politics" />
+  <meta name="description" content="Base de datos interactiva de partidos políticos de Europa, Canadá y Australia. Descarga datos sobre líderes, ideología y resultados electorales. Universitat Pompeu Fabra." />
+  <meta name="keywords" content="Regional Party Leadership Database, partidos políticos, European parties, party leaders, electoral data, UPF, comparative politics" />
 
-<!-- Open Graph (para compartir en redes sociales) -->
-<meta property="og:title" content="Regional Party Leadership Database – UPF" />
-<meta property="og:description" content="Interactive database to explore and download regional party leadership data from Europe, Canada and Australia." />
-<meta property="og:url" content="https://paubelloperez.github.io/Prueba-Political-Parties-DB/" />
-<meta property="og:type" content="website" />
+  <!-- Open Graph (para compartir en redes sociales) -->
+  <meta property="og:title" content="Regional Party Leadership Database – UPF" />
+  <meta property="og:description" content="Interactive database to explore and download regional party leadership data from Europe, Canada and Australia." />
+  <meta property="og:url" content="https://paubelloperez.github.io/Prueba-Political-Parties-DB/" />
+  <meta property="og:type" content="website" />
 
-<!-- Título en la pestaña -->
-<title>Regional Party Leadership Database | Universitat Pompeu Fabra</title>
+  <title>Regional Party Leadership Database | Universitat Pompeu Fabra</title>
 
   <!-- Fonts & Leaflet -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <!-- External Libraries -->
@@ -45,597 +43,574 @@
       font-display: swap;
     }
 
-    /* ========== CSS Variables ========== */
+    /* ========== Variables ========== */
     :root {
-      --bg: #F4F0EA;
-      --card: #FDFAF5;
-      --text: #1C1714;
-      --text-secondary: #6B5D52;
-      --muted: #9C8D82;
-      --border: #D8CFC4;
-      --border-light: #EDE7DF;
-      
+      --sea: #0E3538;
+      --sea-deep: #092629;
+      --white: #FFFDF8;
+      --ink: #101B1C;
+      --soft: #566867;
+      --mist: #ECEEE6;
+      --mist-deep: #DDE1D8;
+
       --brand: #C8102E;
-      --brand-hover: #C8102E;
-      --brand-light: #F5E4E6;
-      
-      --chip: #EDE7DF;
-      --chip-selected: #C8102E;
-      --chip-selected-text: #fff;
-      
-      --success: #2D6A4F;
-      --warning: #C77B2A;
-      --danger: #C8102E;
-      
-      --radius: 4px;
-      --radius-lg: 6px;
-      --shadow: 0 1px 4px rgba(28, 23, 20, 0.07), 0 1px 2px rgba(28, 23, 20, 0.05);
-      --shadow-lg: 0 8px 28px rgba(28, 23, 20, 0.12), 0 3px 8px rgba(28, 23, 20, 0.06);
-      
-      --font: 'DM Sans', system-ui, -apple-system, sans-serif;
-      --font-display: 'Playfair Display', Georgia, serif;
-      --font-mono: 'DM Mono', 'Courier New', monospace;
+      --brand-dark: #A50D26;
+      --brand-tint: #FBE9EC;
+
+      --font: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
       --font-upf: 'Excelsor', Georgia, serif;
-      --upf-red: #C8102E; 
-      
-      --header-height: 64px;
+
+      --shadow-hard: 4px 4px 0 rgba(7, 26, 28, 0.85);
     }
 
-    /* ========== Global Styles ========== */
+    /* ========== Global ========== */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    html, body {
-      height: 100%;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--sea);
+      color: var(--ink);
       font-family: var(--font);
-      line-height: 1.6;
+      font-size: 15px;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ========== Header & Navigation ========== */
-    .header {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      border-top: 4px solid var(--brand);
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 900;
-      height: var(--header-height);
+    ::selection {
+      background: var(--brand);
+      color: var(--white);
     }
 
-    .header-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 16px;
+    button {
       font-family: var(--font);
-      letter-spacing: 0.01em;
-      transition: color 0.2s;
     }
 
-    .logo:hover {
-      color: var(--brand);
+    /* ========== Canvas: the map IS the page ========== */
+    .canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
     }
 
-    .logo-icon {
-      width: 56px;
-      height: 36px;
-      background: var(--brand);
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 11px;
-      font-family: var(--font-mono);
-      letter-spacing: 0.05em;
-    }
-
-    .logo-title {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-    }
-
-    .logo-title strong {
-      font-family: var(--font-display);
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .logo-title span {
-      font-size: 14px;
-      font-family: var(--font-upf);
-      font-weight: 700;
-      color: var(--upf-red);
-      letter-spacing: 0.02em;
-      text-transform: none;
-    }
-
-    .nav {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .nav-link {
-      padding: 6px 14px;
-      text-decoration: none;
-      color: var(--text-secondary);
-      font-weight: 500;
-      font-size: 13px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      border-radius: var(--radius);
-      transition: all 0.2s;
-      position: relative;
-    }
-
-    .nav-link:hover {
-      color: var(--brand);
-      background: var(--brand-light);
-    }
-
-    .nav-link.active {
-      color: var(--brand);
-      font-weight: 600;
-    }
-
-    .nav-link.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 14px;
-      right: 14px;
-      height: 2px;
-      background: var(--brand);
-      border-radius: 0;
-    }
-
-    /* Mobile Menu Toggle */
-    .menu-toggle {
-      display: none;
-      background: transparent;
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      color: var(--text);
-      font-size: 20px;
-    }
-
-    /* ========== Main Content ========== */
-    .main-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 32px 24px;
-      min-height: calc(100vh - var(--header-height) - 120px);
-    }
-
-    .page-header {
-      margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 2px solid var(--text);
-    }
-
-    .page-header-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 28px;
-      flex-wrap: wrap;
-    }
-
-    .page-header-copy {
-      flex: 1 1 680px;
-      min-width: 0;
-    }
-
-    .page-title {
-      font-size: 38px;
-      font-weight: 700;
-      font-family: var(--font-display);
-      margin-bottom: 10px;
-      color: var(--text);
-      line-height: 1.15;
-      letter-spacing: -0.01em;
-    }
-
-    .page-description {
-      font-size: 15px;
-      color: var(--text-secondary);
-      max-width: 700px;
-      font-weight: 300;
-      line-height: 1.7;
-    }
-
-    .summary-stats {
-      flex: 0 1 430px;
-      min-width: 320px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      align-self: stretch;
-    }
-
-    .summary-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      padding: 16px 14px;
-      min-height: 108px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .summary-label {
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-family: var(--font-mono);
-      line-height: 1.4;
-    }
-
-    .summary-value {
-      font-size: 28px;
-      line-height: 1;
-      font-weight: 700;
-      font-family: var(--font-display);
-      color: var(--brand);
-      letter-spacing: -0.02em;
-    }
-
-    .summary-note {
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.4;
-    }
-
-    /* ========== Toolbar ========== */
-    .toolbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .segmented {
-      display: inline-flex;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      padding: 4px;
-    }
-
-    .segmented button {
-      padding: 10px 18px;
-      border: 0;
-      background: transparent;
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--muted);
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .segmented button:hover {
-      background: var(--border-light);
-      color: var(--text);
-    }
-
-    .segmented button.active {
-      background: var(--brand);
-      color: #fff;
-      box-shadow: none;
-    }
-
-    #resetView {
-      margin-left: auto;
-    }
-
-    /* ========== Cards & Surfaces ========== */
-    .surface {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 24px;
-    }
-
-    /* ========== Map ========== */
     #map {
-      height: 65vh;
-      min-height: 500px;
-      border-radius: var(--radius-lg);
-      position: relative;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--sea);
       z-index: 1;
     }
 
-    /* Leaflet zoom controls positioning */
+    /* Leaflet controls: keep the default top-left zoom, tucked below the brand */
     .leaflet-top.leaflet-right {
-      top: 10px;
-      right: 10px;
-      z-index: 800;
+      display: none;
     }
 
-    /* ========== Sidebar ========== */
-    .sidebar {
+    .leaflet-top.leaflet-left {
+      top: 170px;
+      left: 24px;
+    }
+
+    .leaflet-bar {
+      border: 0 !important;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-hard) !important;
+    }
+
+    .leaflet-bar a {
+      background: var(--white);
+      color: var(--ink);
+      border-bottom-color: var(--mist-deep) !important;
+    }
+
+    /* Leaflet gives clicked country paths keyboard focus for a11y; browsers then
+       draw a default focus ring around the path's rectangular bounding box. */
+    .leaflet-interactive:focus {
+      outline: none;
+    }
+
+    /* Country quick-summary tooltip (follows the cursor) */
+    .leaflet-tooltip.country-tip {
+      background: var(--white);
+      color: var(--ink);
+      border: 0;
+      border-radius: 10px;
+      box-shadow: var(--shadow-hard);
+      font-family: var(--font);
+      padding: 10px 14px;
+      line-height: 1.45;
+    }
+
+    .leaflet-tooltip-top.country-tip::before {
+      border-top-color: var(--white);
+    }
+
+    .leaflet-tooltip-bottom.country-tip::before {
+      border-bottom-color: var(--white);
+    }
+
+    .leaflet-tooltip-left.country-tip::before {
+      border-left-color: var(--white);
+    }
+
+    .leaflet-tooltip-right.country-tip::before {
+      border-right-color: var(--white);
+    }
+
+    .country-pop strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .country-pop span {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--soft);
+      margin-top: 2px;
+    }
+
+    .country-pop em {
+      display: inline-block;
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--brand);
+      margin-top: 7px;
+    }
+
+    .country-pop em.off {
+      color: var(--soft);
+    }
+
+    /* ========== Floating top bar (over the map) ========== */
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1100;
+      display: flex;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      column-gap: 28px;
+      row-gap: 12px;
+      padding: 22px 24px 0;
+      pointer-events: none;
+    }
+
+    .topbar > * {
+      pointer-events: auto;
+    }
+
+    .brand {
+      text-decoration: none;
+      display: block;
+      max-width: 340px;
+    }
+
+    .brand-name {
+      display: block;
+      color: var(--white);
+      font-size: 25px;
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      text-shadow: 0 1px 8px rgba(9, 38, 41, 0.55);
+    }
+
+    .brand:hover .brand-name {
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-decoration-color: var(--brand);
+      text-underline-offset: 5px;
+    }
+
+    .brand-upf {
+      display: inline-block;
+      margin-top: 9px;
+      background: var(--brand);
+      color: #fff;
+      font-family: var(--font-upf);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 3px 9px 4px;
+      border-radius: 4px;
+    }
+
+    /* Scope switcher: floating solid blocks */
+    .segmented {
+      display: inline-flex;
+      gap: 8px;
+      margin-left: auto;
+      padding-top: 4px;
+    }
+
+    .segmented .seg {
+      border: 0;
+      background: var(--white);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.1s;
+    }
+
+    .segmented .seg:hover {
+      transform: translate(-1px, -1px);
+    }
+
+    .segmented .seg.active {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    /* Nav floating on the sea */
+    .nav {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      padding-top: 12px;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: rgba(255, 253, 248, 0.72);
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    .nav-link:hover {
+      color: var(--white);
+    }
+
+    .nav-link.active {
+      color: var(--white);
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-decoration-color: var(--brand);
+      text-underline-offset: 6px;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 2px solid rgba(255, 253, 248, 0.6);
+      border-radius: 8px;
+      color: var(--white);
+      padding: 4px 11px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    /* ========== Floating countries panel ========== */
+    .side-panel {
+      position: absolute;
+      top: 108px;
+      right: 24px;
+      bottom: calc(14vh + 34px);
+      width: 302px;
+      z-index: 1100;
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: 8px 8px 0 rgba(7, 26, 28, 0.6);
       display: flex;
       flex-direction: column;
-      height: 65vh;
-      min-height: 500px;
+      padding: 18px 16px 12px;
+}
+
+    .panel-label,
+    .party-controls-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--soft);
+      margin-bottom: 8px;
     }
 
-    .sidebar .section {
-      padding: 16px;
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .sidebar .section:last-child {
-      border-bottom: 0;
-    }
-
-    .section-title {
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-family: var(--font-mono);
-    }
-
-    /* ========== Search & Input ========== */
     .search {
       display: flex;
-      gap: 8px;
     }
 
     .input {
       flex: 1;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      border-radius: 10px;
-      padding: 10px 14px;
-      color: var(--text);
+      border: 0;
+      background: var(--mist);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--ink);
       font-size: 14px;
-      transition: all 0.2s;
       font-family: var(--font);
+      appearance: none;
     }
 
     .input:focus {
-      outline: none;
-      border-color: var(--brand);
-      background: var(--card);
-      box-shadow: 0 0 0 3px var(--brand-light);
+      outline: 2px solid var(--brand);
+      outline-offset: 1px;
     }
 
     .input::placeholder {
-      color: var(--muted);
+      color: var(--soft);
     }
 
-    /* ========== Country List ========== */
+    .panel-actions {
+      display: flex;
+      gap: 12px;
+      margin: 8px 0 4px;
+    }
+
     .list {
-      overflow: auto;
       flex: 1;
-      padding: 8px;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+margin: 4px -6px 0;
+      padding: 0 6px;
     }
 
     .country {
-      padding: 10px 12px;
-      border-radius: 10px;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border: 1px solid transparent;
-      transition: all 0.2s;
-      margin-bottom: 4px;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 2px;
     }
 
     .country:hover {
-      background: var(--border-light);
-      border-color: var(--border);
+      background: var(--mist);
     }
 
     .country.selected {
-      background: var(--brand-light);
-      border-color: var(--brand);
+      background: var(--brand-tint);
     }
 
     .country-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
+      min-width: 0;
     }
 
-    .country-flag {
-      font-size: 20px;
-      line-height: 1;
+    .country-left input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--brand);
+      flex: none;
     }
 
     .country-name {
-      font-weight: 500;
       font-size: 14px;
-      color: var(--text);
+      font-weight: 600;
+    }
+
+    .country.selected .country-name {
+      color: var(--brand);
     }
 
     .count {
-      font-size: 12px;
-      color: var(--muted);
-      background: var(--border-light);
-      padding: 2px 8px;
-      border-radius: 12px;
+      font-size: 11px;
       font-weight: 600;
-    }
-
-    /* ========== Party Chips ========== */
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      max-height: 200px;
-      overflow: auto;
-      margin-top: 12px;
-      padding: 2px;
-    }
-
-    .chip {
-      padding: 8px 14px;
-      border-radius: 20px;
-      background: var(--chip);
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      border: 1.5px solid var(--border);
-      transition: all 0.2s;
-      color: var(--text);
-    }
-
-    .chip:hover {
-      border-color: var(--brand);
-      background: var(--brand-light);
-    }
-
-    .chip.selected {
-      background: var(--chip-selected);
-      color: var(--chip-selected-text);
-      border-color: var(--chip-selected);
-      box-shadow: none;
-    }
-
-    .search-match {
-      background: #F8DFA5;
-      color: inherit;
-      text-decoration: underline;
-      text-decoration-color: var(--brand);
-      text-decoration-thickness: 2px;
-      text-underline-offset: 2px;
-      border-radius: 2px;
-      padding: 0 1px;
-    }
-
-    /* ========== Buttons ========== */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      padding: 10px 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.2s;
-      color: var(--text);
-      font-family: var(--font);
+      color: var(--soft);
       white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
 
-    .btn:hover:not([disabled]) {
-      background: var(--border-light);
-      border-color: var(--muted);
+    .country.selected .count {
+      color: var(--brand);
     }
 
-    .btn.primary {
-      background: var(--brand);
-      border-color: var(--brand);
-      color: #fff;
-    }
-
-    .btn.primary:hover:not([disabled]) {
-      background: var(--brand-hover);
-      box-shadow: none;
-    }
-
-    .btn.ghost {
-      background: transparent;
-      border-color: transparent;
-    }
-
-    .btn.ghost:hover:not([disabled]) {
-      background: var(--border-light);
-    }
-
-    .btn[disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* ========== Preview Section ========== */
-    .preview {
-      padding: 20px;
-      margin-top: 24px;
-    }
-
-    .preview-header {
+    .panel-foot {
       display: flex;
-      gap: 16px;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .preview-title {
-      font-size: 22px;
-      font-weight: 700;
-      font-family: var(--font-display);
-      color: var(--text);
+      gap: 10px;
+      padding-top: 8px;
     }
 
     .hint {
-      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--soft);
+    }
+
+    /* ========== The sheet: slides up OVER the map ========== */
+    .sheet {
+      position: relative;
+      z-index: 10;
+      margin-top: 86vh;
+      background: var(--white);
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -18px 44px rgba(9, 38, 41, 0.45);
+      padding: 46px clamp(22px, 4.5vw, 60px) 30px;
+      min-height: 60vh;
+    }
+
+    /* Big typographic figures — no boxes, no dividers */
+    .figures {
+      display: flex;
+      gap: clamp(28px, 4.5vw, 64px);
+      flex-wrap: wrap;
+      margin-bottom: 38px;
+    }
+
+    .figure-num {
+      display: block;
+      font-size: clamp(28px, 2.9vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--sea);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .figure-label {
+      display: block;
+      margin-top: 5px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--soft);
+    }
+
+    /* Preview */
+    .preview-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px 28px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .preview-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+      min-width: min(100%, 360px);
+    }
+
+    .preview-title {
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    #selectedCountry {
+      color: var(--brand);
       font-size: 13px;
     }
 
-    /* ========== Table ========== */
-    .table-wrap {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow-x: auto;
+    .selection-summary {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(58px, auto));
+      gap: 8px 12px;
+      margin-left: auto;
+      text-align: right;
+      align-items: end;
+    }
+
+    .selection-stat {
+      min-width: 0;
+    }
+
+    .selection-stat strong {
+      display: block;
+      color: var(--sea);
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .selection-stat span {
+      display: block;
+      margin-top: 3px;
+      color: var(--soft);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .party-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .party-controls-row .party-controls-label {
+      margin: 0;
+    }
+
+    .party-controls-row .input {
+      max-width: 300px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      max-height: 180px;
+      overflow: auto;
       margin-top: 16px;
+    }
+
+    .chip {
+      border: 0;
+      background: var(--mist);
+      color: var(--soft);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .chip:hover {
+      background: var(--mist-deep);
+      color: var(--ink);
+    }
+
+    .chip.selected {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .search-match {
+      background: #FFE39B;
+      color: var(--ink);
+      border-radius: 3px;
+      padding: 0 1px;
+    }
+
+    .chip.selected .search-match {
+      background: rgba(255, 255, 255, 0.28);
+      color: inherit;
+    }
+
+    /* ========== Table: solid header band + zebra, no rules ========== */
+    .table-wrap {
+      margin-top: 22px;
+      border-radius: 14px;
+      overflow: auto;
+      box-shadow: var(--shadow-hard);
     }
 
     table {
@@ -643,276 +618,362 @@
       min-width: 1420px;
       table-layout: fixed;
       border-collapse: collapse;
-      font-size: 14px;
+      font-size: 13.5px;
     }
 
     thead th {
       position: sticky;
       top: 0;
-      background: var(--text);
-      border-bottom: 2px solid var(--text);
-      padding: 11px 14px;
+      z-index: 2;
+      background: var(--sea);
+      color: #E9F0EC;
+      padding: 13px 14px;
       text-align: left;
       user-select: none;
       cursor: pointer;
-      font-weight: 500;
-      color: #F4F0EA;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-family: var(--font-mono);
-      transition: background 0.2s;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background 0.15s;
     }
 
     thead th:hover {
-      background: var(--brand);
+      background: var(--sea-deep);
     }
 
     tbody td {
-      border-top: 1px solid var(--border-light);
-      padding: 12px 14px;
-      color: var(--text);
+      padding: 11px 14px;
       overflow-wrap: anywhere;
       vertical-align: top;
-    }
-
-    tbody tr:hover {
-      background: var(--border-light);
+      font-variant-numeric: tabular-nums;
     }
 
     tbody tr:nth-child(even) {
-      background: rgba(0, 0, 0, 0.015);
+      background: rgba(14, 53, 56, 0.05);
     }
 
-    tbody tr:nth-child(even):hover {
-      background: var(--border-light);
+    tbody tr:hover {
+      background: var(--brand-tint);
     }
 
-    /* ========== Footer ========== */
+    /* ========== Buttons: pressed-print style ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 2px solid var(--ink);
+      background: var(--white);
+      color: var(--ink);
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform 0.08s, box-shadow 0.08s;
+    }
+
+    .btn:hover:not([disabled]) {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .btn:active:not([disabled]) {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand-dark);
+      color: #fff;
+      box-shadow: 3px 3px 0 var(--brand-dark);
+    }
+
+    .btn.primary:hover:not([disabled]) {
+      box-shadow: 4px 4px 0 var(--brand-dark);
+    }
+
+    .btn.primary:active:not([disabled]) {
+      box-shadow: 1px 1px 0 var(--brand-dark);
+    }
+
+    .btn.ghost {
+      border: 2px solid transparent;
+      background: transparent;
+      box-shadow: none;
+      color: var(--soft);
+      padding: 6px 8px;
+    }
+
+    .btn.ghost:hover:not([disabled]) {
+      transform: none;
+      box-shadow: none;
+      color: var(--brand);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .btn[disabled] {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
     .footer-controls {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 0 0 0;
+      padding: 24px 0 0;
       flex-wrap: wrap;
     }
 
     #pagination {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
 
-    /* ========== Toast Notifications ========== */
+    #pagination .btn {
+      padding: 6px 11px;
+      box-shadow: none;
+      border-width: 2px;
+    }
+
+    #pagination .btn:hover:not([disabled]) {
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ========== Status / toast / loader ========== */
+    #dataStatus {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
     .toast {
       position: fixed;
       right: 24px;
       bottom: 24px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-lg);
-      padding: 14px 18px;
-      border-radius: var(--radius);
+      background: var(--brand);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 6px 6px 0 rgba(7, 26, 28, 0.5);
       display: none;
       max-width: 400px;
-      animation: slideIn 0.3s ease;
+      animation: slideIn 0.25s ease;
       z-index: 10000;
     }
 
     @keyframes slideIn {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
-    /* ========== Loader ========== */
     .loader {
-      width: 18px;
-      height: 18px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
-      border: 3px solid var(--border);
+      border: 2.5px solid var(--mist-deep);
       border-top-color: var(--brand);
-      animation: spin 1s linear infinite;
+      animation: spin 0.9s linear infinite;
+      flex: none;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    /* ========== Site Footer ========== */
+    /* ========== Footer (inside the sheet) ========== */
     .site-footer {
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      padding: 32px 24px;
       margin-top: 64px;
     }
 
     .footer-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 12.5px;
+      color: var(--soft);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
     }
 
     .footer-container a {
-      color: var(--brand);
+      color: var(--soft);
+      font-weight: 700;
       text-decoration: none;
     }
 
     .footer-container a:hover {
+      color: var(--brand);
       text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
     }
 
-    /* ========== Responsive Design ========== */
-    @media (max-width: 1024px) {
-      .grid {
-        grid-template-columns: 1fr;
+    /* ========== Responsive ========== */
+    @media (max-width: 1100px) {
+      .canvas {
+        position: static;
+        z-index: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .topbar {
+        position: relative;
+        order: 1;
+        background: var(--sea);
+        padding: 18px 18px 14px;
       }
 
       #map {
-        height: 50vh;
-        min-height: 400px;
+        order: 2;
       }
 
-      .sidebar {
-        height: auto;
-        min-height: auto;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .header-container {
-        padding: 0 16px;
+      .side-panel {
+        order: 3;
       }
 
-      .nav {
-        display: none;
+      .menu-toggle {
         position: absolute;
-        top: var(--header-height);
-        left: 0;
-        right: 0;
-        background: var(--card);
-        border-bottom: 1px solid var(--border);
-        box-shadow: var(--shadow-lg);
-        flex-direction: column;
-        padding: 16px;
-        gap: 4px;
+        top: 18px;
+        right: 16px;
+        margin-left: 0;
       }
 
-      .nav.mobile-open {
-        display: flex;
+      .brand {
+        padding-right: 56px;
       }
 
-      .nav-link {
-        width: 100%;
-        text-align: left;
-      }
-
-      .nav-link.active::after {
-        display: none;
+      .brand-name {
+        font-size: 21px;
       }
 
       .menu-toggle {
         display: block;
       }
 
-      .main-content {
-        padding: 24px 16px;
-      }
-
-      .page-title {
-        font-size: 24px;
-      }
-
-      .page-header-inner {
+      .nav {
+        display: none;
+        width: 100%;
         flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 4px 0 8px;
+        order: 4;
       }
 
-      .page-header-copy,
-      .summary-stats {
-        flex-basis: 100%;
-        min-width: 100%;
-      }
-
-      .summary-stats {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .toolbar {
-        flex-direction: column;
-        align-items: stretch;
+      .nav.mobile-open {
+        display: flex;
       }
 
       .segmented {
-        justify-content: center;
-      }
-
-      #resetView {
+        order: 3;
         margin-left: 0;
+        width: 100%;
+        padding-top: 0;
       }
 
-      .grid {
-        gap: 16px;
+      #map {
+        position: static;
+        height: 46vh;
+        min-height: 340px;
       }
 
-      .preview-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .logo {
-        font-size: 16px;
+      .leaflet-top.leaflet-left {
+        top: 12px;
+        left: 12px;
       }
 
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
+      .side-panel {
+        position: static;
+        width: auto;
+        margin: 16px;
+        bottom: auto;
+        box-shadow: 6px 6px 0 rgba(7, 26, 28, 0.6);
       }
 
-      .summary-stats {
-        grid-template-columns: 1fr;
+      .list {
+        flex: none;
+        max-height: 250px;
       }
 
-      .summary-card {
+      .sheet {
+        margin-top: 18px;
+        border-radius: 22px 22px 0 0;
+        padding: 30px 20px 24px;
         min-height: auto;
       }
 
-      .summary-value {
-        font-size: 24px;
-      }
-
-      .segmented button {
-        padding: 8px 14px;
-        font-size: 13px;
+      .figures {
+        gap: 32px;
+        margin-bottom: 34px;
       }
     }
+
+    @media (max-width: 560px) {
+      .preview-title {
+        font-size: 22px;
+      }
+
+      .figure-num {
+        font-size: 26px;
+      }
+
+      .segmented .seg {
+        padding: 8px 13px;
+        font-size: 12.5px;
+      }
+    }
+    @media (max-width: 860px) {
+      .selection-summary {
+        width: 100%;
+        margin-left: 0;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        text-align: left;
+      }
+    }
+@media (max-width: 560px) {
+      .selection-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
   </style>
 </head>
 <body>
-  <!-- ========== Header ========== -->
-  <header class="header">
-    <div class="header-container">
-      <a href="index_2.html" class="logo">
-        <div class="logo-icon">RePaLeD</div>
-        <div class="logo-title">
-          <strong>Regional Party Leadership Database</strong>
-          <span>Universitat Pompeu Fabra</span>
-        </div>
+  <!-- ========== Canvas: full-viewport map with floating layers ========== -->
+  <div class="canvas">
+    <!-- Interactive Map (the page background itself) -->
+    <div id="map"></div>
+
+    <!-- Floating top bar -->
+    <div class="header-container topbar">
+      <a href="index_2.html" class="brand">
+        <span class="brand-name">Regional Party Leadership Database</span>
+        <span class="brand-upf">Universitat Pompeu Fabra</span>
       </a>
 
-      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-        ☰
-      </button>
+      <div class="segmented" role="tablist" aria-label="Map scopes">
+        <button class="seg active" data-map="Europe" role="tab" aria-selected="true">Europe</button>
+        <button class="seg" data-map="Canada" role="tab">Canada</button>
+        <button class="seg" data-map="Australia" role="tab">Australia</button>
+      </div>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
 
       <nav class="nav" id="mainNav">
         <a href="index_2.html" class="nav-link active">Data</a>
@@ -921,102 +982,92 @@
         <a href="contact_2.html" class="nav-link">Contact</a>
       </nav>
     </div>
-  </header>
 
-  <!-- ========== Main Content ========== -->
-  <main class="main-content">
-    <!-- Page Header -->
-    <div class="page-header">
-      <div class="page-header-inner">
-        <div class="page-header-copy">
-          <h1 class="page-title">Regional Party Leadership Database</h1>
-          <p class="page-description">
-            Explore and download comprehensive data on regional parties leadership across Europe, Canada, and Australia. 
-            Select countries and parties to view detailed information and export data.
-          </p>
-        </div>
-
-        <div class="summary-stats" aria-label="Database summary">
-          <div class="summary-card">
-            <span class="summary-label">Observations</span>
-            <strong class="summary-value" id="totalObservations">—</strong>
-            <span class="summary-note">Total rows available in the database</span>
-          </div>
-          <div class="summary-card">
-            <span class="summary-label">Countries</span>
-            <strong class="summary-value" id="totalCountries">—</strong>
-            <span class="summary-note">Countries currently covered</span>
-          </div>
-          <div class="summary-card">
-            <span class="summary-label">Parties</span>
-            <strong class="summary-value" id="totalParties">—</strong>
-            <span class="summary-note">Distinct parties in the database</span>
-          </div>
-        </div>
+    <!-- Floating countries panel -->
+    <aside class="side-panel">
+      <label class="panel-label" for="countrySearch">search country</label>
+      <div class="search">
+        <input
+          id="countrySearch"
+          class="input"
+          type="search"
+          placeholder="Type to search…"
+          aria-label="Search country"
+        />
       </div>
-    </div>
-
-    <!-- Map Selector Toolbar -->
-    <div class="toolbar">
-      <div class="segmented" role="tablist" aria-label="Map scopes">
-        <button class="seg active" data-map="Europe" role="tab" aria-selected="true"><img src="EU_Flag.svg.webp" alt="EU" style="height:1em; vertical-align:middle; margin-right:4px; border-radius:3px;"> Europe</button>
-        <button class="seg" data-map="Canada" role="tab"><img src="CA_Flag.png" alt="CA" style="height:1em; vertical-align:middle; margin-right:4px; border-radius:3px;"> Canada</button>
-        <button class="seg" data-map="Australia" role="tab"><img src="AU_Flag.svg" alt="AU" style="height:1em; vertical-align:middle; margin-right:4px; border-radius:3px;"> Australia</button>
+      <div class="panel-actions">
+        <button id="btnClearCountry" class="btn ghost" disabled>clear country</button>
       </div>
-      <button id="resetView" class="btn ghost" title="Reset map view">
-        <span>↺</span> Reset View
-      </button>
-    </div>
+      <div class="list" id="countryList" aria-label="Country list"></div>
+      <div class="panel-foot">
+        <div id="dataStatus" class="hint"></div>
+        <button id="resetView" class="btn ghost" title="Reset map view">↺ reset view</button>
+      </div>
+    </aside>
+  </div>
 
-    <!-- Map & Sidebar Grid -->
-    <div class="surface grid">
-      <!-- Interactive Map -->
-      <div id="map"></div>
-
-      <!-- Country Selection Sidebar -->
-      <aside class="sidebar">
-        <div class="section">
-          <label class="section-title" for="countrySearch">Search Countries</label>
-          <div class="search">
-            <input 
-              id="countrySearch" 
-              class="input" 
-              type="search" 
-              placeholder="Type to search..." 
-              aria-label="Search country"
-            />
-          </div>
-          <div style="display: flex; gap: 8px; margin-top: 12px;">
-            <button id="btnSelectAllCountries" class="btn ghost">Select All</button>
-            <button id="btnClearCountries" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div class="list" id="countryList" aria-label="Countries list"></div>
-      </aside>
+  <!-- ========== Sheet: slides up over the map ========== -->
+  <main class="sheet">
+    <div class="figures" aria-label="Database summary">
+      <div class="figure">
+        <strong class="figure-num" id="totalObservations">—</strong>
+        <span class="figure-label">observations</span>
+      </div>
+      <div class="figure">
+        <strong class="figure-num" id="totalCountries">—</strong>
+        <span class="figure-label">countries covered</span>
+      </div>
+      <div class="figure">
+        <strong class="figure-num" id="totalParties">—</strong>
+        <span class="figure-label">distinct parties</span>
+      </div>
     </div>
 
     <!-- Data Preview & Download Section -->
-    <div class="surface preview" aria-live="polite">
+    <section class="preview" aria-live="polite">
       <div class="preview-header">
-        <div>
+        <div class="preview-heading">
           <h2 class="preview-title">Preview and Download Data</h2>
           <span id="selectedCountry" class="hint"></span>
         </div>
-        <div id="dataStatus" class="hint" style="display: flex; align-items: center; gap: 8px;"></div>
+        <div class="selection-summary" id="selectionSummary" aria-label="Selection summary">
+          <div class="selection-stat">
+            <strong id="selectionObservations">&mdash;</strong>
+            <span>observations</span>
+          </div>
+          <div class="selection-stat">
+            <strong id="selectionParties">&mdash;</strong>
+            <span>parties</span>
+          </div>
+          <div class="selection-stat">
+            <strong id="selectionRegions">&mdash;</strong>
+            <span>regions</span>
+          </div>
+          <div class="selection-stat">
+            <strong id="selectionLeaders">&mdash;</strong>
+            <span>leaders</span>
+          </div>
+          <div class="selection-stat">
+            <strong id="selectionWomen">&mdash;</strong>
+            <span>women</span>
+          </div>
+          <div class="selection-stat">
+            <strong id="selectionUpdated">&mdash;</strong>
+            <span>last update</span>
+          </div>
+        </div>
       </div>
 
       <!-- Party Selection -->
-      <div class="section" style="padding: 0 0 16px 0; border: 0;">
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <label class="hint" style="font-weight: 700;" for="partySearch">Search data:</label>
-          <button id="selectAll" class="btn ghost" disabled>Select All</button>
-          <button id="clearAll" class="btn ghost" disabled>Clear</button>
-          <input 
-            id="partySearch" 
-            class="input" 
-            style="max-width: 300px;" 
-            type="search" 
-            placeholder="Party, region or leader..." 
+      <div class="party-controls">
+        <div class="party-controls-row">
+          <button id="selectAll" class="btn ghost" disabled>select visible</button>
+          <button id="clearAll" class="btn ghost" disabled>show all</button>
+          <input
+            id="partySearch"
+            class="input"
+            type="search"
+            placeholder="Party, region or leader&hellip;"
             aria-label="Search parties, regions and party leaders"
           />
         </div>
@@ -1027,15 +1078,16 @@
       <div class="table-wrap" id="previewWrap" style="display: none;">
         <table id="previewTable" aria-label="Party data by country">
           <colgroup>
+            <col style="width: 8%;">
             <col style="width: 10%;">
             <col style="width: 12%;">
-            <col style="width: 12%;">
-            <col style="width: 14%;">
-            <col style="width: 8%;">
-            <col style="width: 8%;">
+            <col style="width: 13%;">
             <col style="width: 7%;">
             <col style="width: 7%;">
-            <col style="width: 10%;">
+            <col style="width: 8%;">
+            <col style="width: 6%;">
+            <col style="width: 6%;">
+            <col style="width: 11%;">
             <col style="width: 12%;">
           </colgroup>
           <thead>
@@ -1046,10 +1098,11 @@
               <th data-key="Party leader">Party Leader</th>
               <th data-key="Year became leader">Since</th>
               <th data-key="Year ended as leader">Until</th>
+              <th data-key="Co-leadership">Co-leadership</th>
               <th data-key="Female leader (0= male; 1 = female)">Female</th>
               <th data-key="Interim leader (0= No; 1 =Yes)">Interim</th>
-              <th data-key="Party family">National Party Name</th>
-              <th data-key="Comments">Comments</th>
+              <th data-key="Party family">National Sister Party</th>
+              <th data-key="Comments">Comment</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1058,30 +1111,26 @@
 
       <!-- Footer Controls -->
       <div class="footer-controls">
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button id="btnPreview" class="btn" disabled>
-            <span></span> Preview Data
-          </button>
-          <button id="btnDownload" class="btn primary" disabled>
-            <span></span> Download data
-          </button>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button id="btnPreview" class="btn" disabled>Preview data</button>
+          <button id="btnDownload" class="btn primary" disabled>↓ Download data</button>
         </div>
         <div id="pagination"></div>
       </div>
-    </div>
-  </main>
+    </section>
 
-  <!-- ========== Site Footer ========== -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <p>&copy; 2026 Regional Party Leadership Database. Universitat Pompeu Fabra.</p>
-      <p style="margin-top: 8px;">
-        <a href="about_2.html">About</a> · 
-        <a href="methodology_2.html">Methodology</a> · 
-        <a href="contact_2.html">Contact</a>
-      </p>
-    </div>
-  </footer>
+    <!-- ========== Footer ========== -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        <p>© 2026 Regional Party Leadership Database · Universitat Pompeu Fabra</p>
+        <div class="footer-links">
+          <a href="about_2.html">About</a>
+          <a href="methodology_2.html">Methodology</a>
+          <a href="contact_2.html">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </main>
 
   <!-- Toast Notification -->
   <div class="toast" id="toast"></div>
@@ -1108,7 +1157,7 @@
       // ========== Mobile Menu Toggle ==========
       const menuToggle = $('#menuToggle');
       const mainNav = $('#mainNav');
-      
+
       menuToggle.addEventListener('click', () => {
         mainNav.classList.toggle('mobile-open');
       });
@@ -1127,16 +1176,17 @@
           prop: 'NAME',
           bounds: [[20, -40], [72, 50]],
           zoom: 4,
-          style: { color: '#0f172a', weight: 1, fillColor: '#C8102E', fillOpacity: 0.5 },
+          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 },
           filter: f => ['Austria', 'France', 'Germany', 'Italy', 'Portugal', 'Spain', 'Switzerland', 'United Kingdom'].includes(f.properties.NAME)
         },
         {
           name: 'Canada',
           file: 'ca.json',
           prop: 'name',
-          bounds: [[41, -141], [83, -52]],
+          bounds: [[20, -141], [83, -52]],
+          center: [20, -96],
           zoom: 3,
-          style: { color: '#0f172a', weight: 1, fillColor: '#C8102E', fillOpacity: 0.5 }
+          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 }
         },
         {
           name: 'Australia',
@@ -1144,7 +1194,7 @@
           prop: 'name',
           bounds: [[-44, 112], [-10, 154]],
           zoom: 4,
-          style: { color: '#0f172a', weight: 1, fillColor: '#C8102E', fillOpacity: 0.5 }
+          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 }
         }
       ];
 
@@ -1153,16 +1203,26 @@
           country: 'Australia',
           folder: 'data/AUSTRALIA',
           files: [
-            'AUSTRALIA_Greens.xlsx',
-            'AUSTRALIA_Labor.xlsx',
-            'AUSTRALIA_Liberal_Party.xlsx',
-            'AUSTRALIA_National_Party.xlsx',
-            'AUSTRALIA_One_Nation.xlsx'
+            'AUSTRALIA_Greens.csv',
+            'AUSTRALIA_Labor.csv',
+            'AUSTRALIA_Liberal_Party.csv',
+            'AUSTRALIA_National_Party.csv',
+            'AUSTRALIA_One_Nation.csv'
+          ]
+        },
+        {
+          country: 'Canada',
+          folder: 'data/CANADA',
+          files: [
+            'CANADA_Conservative.csv',
+            'CANADA_Liberal.csv',
+            'CANADA_NDP.csv',
+            'CANADA_Greens.csv'
           ]
         }
       ];
 
-      // Countries shown in the interface. Workbook loading remains restricted
+      // Countries shown in the interface. Data loading remains restricted
       // to the countries explicitly configured in countryDataSources.
       const allCountries = [
         'Austria',
@@ -1180,7 +1240,8 @@
       // ========== State Variables ==========
       let currentMapIdx = 0;
       let countriesLayer;
-      let selectedCountries = new Set();
+      let selectedCountry = '';
+      let selectedPartyGroups = new Set();
       let partiesDataMain = [];
       let partiesDataCombined = [];
       let countryIndex = new Map();
@@ -1188,11 +1249,74 @@
       let sortAsc = true;
       let currentPage = 1;
       let rowsPerPage = 25;
+      let updatesIndex = new Map();
 
       function formatNumber(value) {
         return new Intl.NumberFormat('en-US').format(value);
       }
 
+      function setSelectionMetric(id, value) {
+        const el = $(`#${id}`);
+        if (el) el.textContent = value;
+      }
+
+      function leaderKey(value) {
+        return String(value ?? '').trim().toLowerCase();
+      }
+
+      function updateSelectionSummary(rows) {
+        const update = selectedCountry ? (updatesIndex.get(selectedCountry) || '—') : '—';
+        setSelectionMetric('selectionUpdated', update);
+
+        if (!selectedCountry) {
+          ['selectionObservations', 'selectionParties', 'selectionRegions', 'selectionLeaders', 'selectionWomen']
+            .forEach(id => setSelectionMetric(id, '—'));
+          return;
+        }
+
+        const selectedRows = rows || [];
+        const parties = new Set(
+          selectedRows.map(row => String(row.Party || '').trim().toLowerCase()).filter(Boolean)
+        );
+        const regions = new Set(
+          selectedRows.map(row => String(row.Region || '').trim().toLowerCase()).filter(Boolean)
+        );
+        const leaders = new Map();
+        selectedRows.forEach(row => {
+          const name = String(row['Party leader'] || '').trim();
+          const key = leaderKey(name);
+          if (!key) return;
+          const current = leaders.get(key) || { female: false };
+          current.female = current.female || numericOrBlank(row['Female leader (0= male; 1 = female)']) === 1;
+          leaders.set(key, current);
+        });
+
+        const uniqueLeaders = leaders.size;
+        const womenLeaders = Array.from(leaders.values()).filter(leader => leader.female).length;
+        const womenShare = uniqueLeaders ? `${Math.round((womenLeaders / uniqueLeaders) * 100)}%` : '—';
+
+        setSelectionMetric('selectionObservations', formatNumber(selectedRows.length));
+        setSelectionMetric('selectionParties', formatNumber(parties.size));
+        setSelectionMetric('selectionRegions', formatNumber(regions.size));
+        setSelectionMetric('selectionLeaders', formatNumber(uniqueLeaders));
+        setSelectionMetric('selectionWomen', womenShare);
+      }
+
+      function getFilteredRows() {
+        if (!selectedCountry) return [];
+        const selParties = selectedPartyFilters();
+        const q = $('#partySearch').value.trim().toLowerCase();
+        return partiesDataCombined.filter(r =>
+          r.Country === selectedCountry &&
+          matchesSearch(r, q) &&
+          (selParties.length
+            ? selParties.some(group =>
+                group.country === r.Country &&
+                group.family === (r['Party family'] || r.Party)
+              )
+            : true)
+        );
+      }
       function updateSummaryStats(arr) {
         const cleanRows = (arr || []).filter(row =>
           Object.values(row || {}).some(value => String(value ?? '').trim() !== '')
@@ -1218,7 +1342,12 @@
       }
 
       // ========== Map Initialization ==========
-      const map = L.map('map', { attributionControl: false }).setView([50, 10], 4);
+      const map = L.map('map', {
+        attributionControl: false,
+        scrollWheelZoom: false,
+        minZoom: 3,
+        maxZoom: 7
+      }).setView([50, 10], 4);
       L.control.zoom({ position: 'topright' }).addTo(map);
 
       $('#resetView').addEventListener('click', () => fitToSelectionOrScope());
@@ -1240,17 +1369,33 @@
       const countryListEl = $('#countryList');
       const countrySearch = $('#countrySearch');
 
-      $('#btnSelectAllCountries').addEventListener('click', () => {
-        allVisibleCountries().forEach(c => selectedCountries.add(c));
-        syncUIAfterCountryChange(true);
+      $('#btnClearCountry').addEventListener('click', () => {
+        setCountrySelection('', true);
       });
 
-      $('#btnClearCountries').addEventListener('click', () => {
-        selectedCountries.clear();
-        syncUIAfterCountryChange(true);
-      });
+      function setCountrySelection(name, fit) {
+        if (selectedCountry === name) return;
+        selectedCountry = name || '';
+        selectedPartyGroups.clear();
+        currentPage = 1;
+        syncUIAfterCountryChange(fit);
+      }
 
       countrySearch.addEventListener('input', () => renderCountryList());
+
+      countryListEl.addEventListener('wheel', e => {
+        const maxScroll = countryListEl.scrollHeight - countryListEl.clientHeight;
+        if (maxScroll <= 0) return;
+        const canScrollUp = countryListEl.scrollTop > 0;
+        const canScrollDown = countryListEl.scrollTop < maxScroll;
+        const wantsUp = e.deltaY < 0;
+        const wantsDown = e.deltaY > 0;
+        if ((wantsUp && canScrollUp) || (wantsDown && canScrollDown)) {
+          e.preventDefault();
+          e.stopPropagation();
+          countryListEl.scrollTop += e.deltaY;
+        }
+      }, { passive: false });
 
       function renderCountryList() {
         const q = countrySearch.value.trim().toLowerCase();
@@ -1258,20 +1403,24 @@
         const items = allVisibleCountries().filter(c => c.toLowerCase().includes(q));
 
         items.forEach(name => {
+          const isSelected = selectedCountry === name;
           const row = document.createElement('div');
-          row.className = 'country' + (selectedCountries.has(name) ? ' selected' : '');
+          row.className = 'country' + (isSelected ? ' selected' : '');
           row.tabIndex = 0;
           row.setAttribute('role', 'button');
+          row.setAttribute('aria-pressed', String(isSelected));
 
           const left = document.createElement('div');
           left.className = 'country-left';
 
           const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.checked = selectedCountries.has(name);
+          cb.type = 'radio';
+          cb.name = 'countrySelection';
+          cb.checked = isSelected;
           cb.setAttribute('aria-label', `Select ${name}`);
 
           const span = document.createElement('span');
+          span.className = 'country-name';
           span.textContent = name;
 
           left.appendChild(cb);
@@ -1284,30 +1433,19 @@
           row.appendChild(left);
           row.appendChild(cnt);
 
-          const toggle = () => {
-            if (cb.checked) {
-              selectedCountries.add(name);
-            } else {
-              selectedCountries.delete(name);
-            }
-            syncUIAfterCountryChange();
-          };
-
           cb.addEventListener('click', e => {
             e.stopPropagation();
-            toggle();
+            setCountrySelection(name, true);
           });
 
           row.addEventListener('click', () => {
-            cb.checked = !cb.checked;
-            toggle();
+            setCountrySelection(name, true);
           });
 
           row.addEventListener('keydown', e => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              cb.checked = !cb.checked;
-              toggle();
+              setCountrySelection(name, true);
             }
           });
 
@@ -1334,13 +1472,28 @@
       btnClearAll.addEventListener('click', () => toggleAllChips(false));
 
       function toggleAllChips(val) {
-        $$('.chip', partyListEl).forEach(ch => ch.classList.toggle('selected', val));
+        if (val) {
+          $$('.chip', partyListEl).forEach(ch => selectedPartyGroups.add(ch.dataset.key));
+        } else {
+          selectedPartyGroups.clear();
+        }
+        buildChips();
         currentPage = 1;
         if ($('#previewWrap').style.display !== 'none') refreshPreview();
       }
 
+      function partyGroupKey(country, family) {
+        return `${country}\u0000${family}`;
+      }
+
+      function selectedPartyFilters() {
+        return Array.from(selectedPartyGroups).map(key => {
+          const [country, family] = key.split('\u0000');
+          return { country, family };
+        });
+      }
       // ========== Preview + Export ==========
-      const selectedCountrySpan = $('#selectedCountry');
+
       const btnPreview = $('#btnPreview');
       const btnDownload = $('#btnDownload');
       const previewWrap = $('#previewWrap');
@@ -1377,18 +1530,42 @@
         return Number.isFinite(numeric) ? numeric : '';
       }
 
-      function normalizeRow(r) {
+      function cleanRecordKeys(record) {
+        return Object.fromEntries(
+          Object.entries(record || {}).map(([key, value]) => [
+            String(key || '').replace(/^\uFEFF/, '').trim(),
+            value
+          ])
+        );
+      }
+
+      function firstValue(row, keys) {
+        for (const key of keys) {
+          if (Object.prototype.hasOwnProperty.call(row, key) && String(row[key] ?? '').trim() !== '') {
+            return row[key];
+          }
+        }
+        return '';
+      }
+
+      function normalizeRow(record) {
+        const r = cleanRecordKeys(record);
         return {
-          Country: r.Country || r.COUNTRY || '',
-          Region: r.Region || '',
-          Comments: r.Comments ?? r.Comment ?? '',
-          Party: r.Party || r.PTYNAME || '',
-          'Interim leader (0= No; 1 =Yes)': numericOrBlank(r['Interim leader (0= No; 1 =Yes)']),
-          'Year became leader': numericOrBlank(r['Year became leader'] ?? r.Since),
-          'Year ended as leader': numericOrBlank(r['Year ended as leader'] ?? r.Until),
-          'Party leader': r['Party leader'] || r.CR20PPGLDR || '',
-          'Female leader (0= male; 1 = female)': numericOrBlank(r['Female leader (0= male; 1 = female)']),
-          'Party family': r['Party family'] || r.Party || r.PTYNAME || ''
+          Country: firstValue(r, ['Country', 'COUNTRY']),
+          Region: firstValue(r, ['Region']),
+          Comments: firstValue(r, ['Comments', 'Comment']),
+          Party: firstValue(r, ['Party', 'Regional Party Name', 'PTYNAME']),
+          'Interim leader (0= No; 1 =Yes)': numericOrBlank(firstValue(r, ['Interim leader (0= No; 1 =Yes)', 'Interim'])),
+          'Year became leader': numericOrBlank(firstValue(r, ['Year became leader', 'Year became party leader', 'Since'])),
+          'Year ended as leader': numericOrBlank(firstValue(r, ['Year ended as leader', 'Year ended as party leader', 'Until'])),
+          'Party leader': firstValue(r, ['Party leader', 'CR20PPGLDR']),
+          'Female leader (0= male; 1 = female)': numericOrBlank(firstValue(r, [
+            'Female leader (0= male; 1 = female)',
+            'Female party leader (0 = male; 1 = female)',
+            'Female party leader'
+          ])),
+          'Co-leadership': numericOrBlank(firstValue(r, ['Co-leadership'])),
+          'Party family': firstValue(r, ['Party family', 'National Sister Party', 'Party', 'PTYNAME'])
         };
       }
 
@@ -1430,13 +1607,29 @@
         element.appendChild(document.createTextNode(text.slice(cursor)));
       }
 
-      async function loadCountryWorkbook(source, file) {
-        const workbookPath = `${source.folder}/${file}`;
-        const response = await fetch(workbookPath);
-        if (!response.ok) throw new Error(`Failed to load ${workbookPath}`);
-        const workbook = XLSX.read(await response.arrayBuffer(), { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        return XLSX.utils.sheet_to_json(sheet, { defval: '' })
+      async function loadCountryDataFile(source, file) {
+        const dataPath = `${source.folder}/${file}`;
+        const response = await fetch(dataPath);
+        if (!response.ok) throw new Error(`Failed to load ${dataPath}`);
+
+        const extension = file.split('.').pop().toLowerCase();
+        let rows;
+        if (extension === 'csv') {
+          const parsed = Papa.parse(await response.text(), {
+            header: true,
+            skipEmptyLines: true
+          });
+          if (parsed.errors && parsed.errors.length) {
+            throw new Error(`Failed to parse ${dataPath}: ${parsed.errors[0].message}`);
+          }
+          rows = parsed.data;
+        } else {
+          const workbook = XLSX.read(await response.arrayBuffer(), { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        }
+
+        return rows
           .map(normalizeRow)
           .filter(row =>
             row.Country === source.country &&
@@ -1444,22 +1637,44 @@
           );
       }
 
-      Promise.all(
-        countryDataSources.flatMap(source =>
-          source.files.map(file => loadCountryWorkbook(source, file))
-        )
-      )
-        .then(countryGroups => {
+      async function loadUpdates() {
+        const response = await fetch('data/Updates.csv');
+        if (!response.ok) throw new Error('Failed to load data/Updates.csv');
+        const parsed = Papa.parse(await response.text(), {
+          header: true,
+          skipEmptyLines: true
+        });
+        if (parsed.errors && parsed.errors.length) {
+          throw new Error(`Failed to parse data/Updates.csv: ${parsed.errors[0].message}`);
+        }
+        return new Map(
+          parsed.data
+            .map(cleanRecordKeys)
+            .map(row => [firstValue(row, ['Country']), firstValue(row, ['Last update'])])
+            .filter(([country, update]) => country && update)
+        );
+      }
+
+      Promise.all([
+        Promise.all(
+          countryDataSources.flatMap(source =>
+            source.files.map(file => loadCountryDataFile(source, file))
+          )
+        ),
+        loadUpdates().catch(() => new Map())
+      ])
+        .then(([countryGroups, updates]) => {
+          updatesIndex = updates;
           partiesDataMain = [];
           partiesDataCombined = countryGroups.flat();
           hydrateIndex(partiesDataCombined);
           updateSummaryStats(partiesDataCombined);
           setStatus('All data loaded');
-          renderCountryList();
+          syncUIAfterCountryChange(false);
         })
         .catch(() => {
           setStatus('Data loading error');
-          showToast('Error loading country workbooks');
+          showToast('Error loading data files');
         });
 
       function hydrateIndex(arr) {
@@ -1469,6 +1684,10 @@
         });
       }
 
+      function scopeCenter(cfg) {
+        return cfg.center || [(cfg.bounds[0][0] + cfg.bounds[1][0]) / 2, (cfg.bounds[0][1] + cfg.bounds[1][1]) / 2];
+      }
+
       // ========== Map Loading ==========
       loadMap();
 
@@ -1476,7 +1695,7 @@
         const cfg = maps[currentMapIdx];
         map.setMaxBounds(cfg.bounds);
         if (countriesLayer) countriesLayer.remove();
-        map.setView([(cfg.bounds[0][0] + cfg.bounds[1][0]) / 2, (cfg.bounds[0][1] + cfg.bounds[1][1]) / 2], cfg.zoom);
+        map.setView(scopeCenter(cfg), cfg.zoom);
 
         fetch(cfg.file)
           .then(r => r.json())
@@ -1491,7 +1710,7 @@
               style: (f) => {
                 const base = cfg.style;
                 const name = f.properties[cfg.prop];
-                const isSel = selectedCountries.has(name);
+                const isSel = selectedCountry === name;
                 return Object.assign({}, base, {
                   weight: isSel ? 3 : 1,
                   fillOpacity: isSel ? 0.65 : 0.5
@@ -1499,9 +1718,18 @@
               },
               onEachFeature: (f, l) => {
                 const name = f.properties[cfg.prop];
-                l.on('click', () => { toggleCountrySelection(name); });
+                l.bindTooltip(() => buildCountryTip(name), {
+                  sticky: true,
+                  direction: 'top',
+                  opacity: 1,
+                  className: 'country-tip'
+                });
+                l.on('click', () => {
+                  toggleCountrySelection(name);
+                  l.setTooltipContent(buildCountryTip(name));
+                });
                 l.on('mouseover', () => l.setStyle({ weight: 3 }));
-                l.on('mouseout', () => { if (!selectedCountries.has(name)) l.setStyle({ weight: 1 }); });
+                l.on('mouseout', () => { if (selectedCountry !== name) l.setStyle({ weight: 1 }); });
               }
             }).addTo(map);
           })
@@ -1509,9 +1737,40 @@
       }
 
       function toggleCountrySelection(name) {
-        if (selectedCountries.has(name)) selectedCountries.delete(name);
-        else selectedCountries.add(name);
-        syncUIAfterCountryChange(true);
+        setCountrySelection(name, true);
+      }
+
+      function buildCountryTip(name) {
+        let obs = 0;
+        const families = new Set();
+        partiesDataCombined.forEach(r => {
+          if (r.Country === name) {
+            obs++;
+            const family = String(r['Party family'] || r.Party || '').trim().toLowerCase();
+            if (family) families.add(family);
+          }
+        });
+
+        const el = document.createElement('div');
+        el.className = 'country-pop';
+
+        const title = document.createElement('strong');
+        title.textContent = name;
+        el.appendChild(title);
+
+        const stats = document.createElement('span');
+        stats.textContent = obs
+          ? `${families.size} ${families.size === 1 ? 'party' : 'parties'} · ${obs} observations`
+          : 'No data available yet';
+        el.appendChild(stats);
+
+        const state = document.createElement('em');
+        const isSel = selectedCountry === name;
+        state.textContent = isSel ? ' Selected' : 'Not selected';
+        if (!isSel) state.className = 'off';
+        el.appendChild(state);
+
+        return el;
       }
 
       function syncUIAfterCountryChange(fit) {
@@ -1521,17 +1780,18 @@
             const cfg = maps[currentMapIdx];
             const name = l.feature.properties[cfg.prop];
             l.setStyle({
-              weight: selectedCountries.has(name) ? 3 : 1,
-              fillOpacity: selectedCountries.has(name) ? 0.65 : 0.5
+              weight: selectedCountry === name ? 3 : 1,
+              fillOpacity: selectedCountry === name ? 0.65 : 0.5
             });
           });
         }
 
-        const hasSelection = selectedCountries.size > 0;
+        const hasSelection = Boolean(selectedCountry);
         $('#btnPreview').disabled = !hasSelection;
         $('#btnDownload').disabled = !hasSelection;
         $('#selectAll').disabled = !hasSelection;
         $('#clearAll').disabled = !hasSelection;
+        $('#btnClearCountry').disabled = !hasSelection;
 
         buildChips();
         if (fit) fitToSelectionOrScope();
@@ -1541,50 +1801,47 @@
 
       function fitToSelectionOrScope() {
         const cfg = maps[currentMapIdx];
-        if (countriesLayer && selectedCountries.size > 0) {
+        if (countriesLayer && selectedCountry) {
           let bounds = null;
           countriesLayer.eachLayer(l => {
             const name = l.feature.properties[cfg.prop];
-            if (selectedCountries.has(name)) bounds = bounds ? bounds.extend(l.getBounds()) : l.getBounds();
+            if (selectedCountry === name) bounds = bounds ? bounds.extend(l.getBounds()) : l.getBounds();
           });
           if (bounds) {
             try {
               map.fitBounds(bounds.pad(0.2));
             } catch (_) {}
           } else {
-            map.setView([(cfg.bounds[0][0] + cfg.bounds[1][0]) / 2, (cfg.bounds[0][1] + cfg.bounds[1][1]) / 2], cfg.zoom);
+            map.setView(scopeCenter(cfg), cfg.zoom);
           }
         } else {
-          map.setView([(cfg.bounds[0][0] + cfg.bounds[1][0]) / 2, (cfg.bounds[0][1][1] + cfg.bounds[1][1]) / 2], cfg.zoom);
+          map.setView(scopeCenter(cfg), cfg.zoom);
         }
       }
 
       function updateSelectedIndicator() {
         const span = $('#selectedCountry');
-        if (selectedCountries.size === 0) span.textContent = '';
-        else if (selectedCountries.size === 1) span.textContent = Array.from(selectedCountries)[0];
-        else span.textContent = selectedCountries.size + ' countries';
+        span.textContent = selectedCountry || '';
       }
 
       function buildChips() {
         const partyListEl = $('#partyList');
         partyListEl.innerHTML = '';
-        if (selectedCountries.size === 0) return;
+        if (!selectedCountry) return;
 
         const q = $('#partySearch').value.trim().toLowerCase();
-        const selCountries = new Set(selectedCountries);
         const groups = new Map();
         const familyCountries = new Map();
         partiesDataCombined.forEach(r => {
           const country = r.Country;
           const family = r['Party family'] || r.Party;
-          if (selCountries.has(country) && family) {
+          if (country === selectedCountry && family) {
             const familyKey = String(family).trim().toLowerCase();
             if (!familyCountries.has(familyKey)) familyCountries.set(familyKey, new Set());
             familyCountries.get(familyKey).add(country);
           }
-          if (selCountries.has(country) && family && matchesSearch(r, q)) {
-            const key = `${country}\u0000${family}`;
+          if (country === selectedCountry && family && matchesSearch(r, q)) {
+            const key = partyGroupKey(country, family);
             groups.set(key, { country, family });
           }
         });
@@ -1594,51 +1851,47 @@
             a.country.localeCompare(b.country) || a.family.localeCompare(b.family)
           )
           .forEach(group => {
-          const c = document.createElement('button');
-          c.type = 'button';
-          c.className = 'chip selected';
-          const familyKey = String(group.family).trim().toLowerCase();
-          const hasDuplicateName = (familyCountries.get(familyKey) || new Set()).size > 1;
-          c.textContent = hasDuplicateName
-            ? `${group.family} (${group.country})`
-            : group.family;
-          c.dataset.country = group.country;
-          c.dataset.family = group.family;
-          c.setAttribute('aria-pressed', 'true');
-          c.onclick = () => {
-            c.classList.toggle('selected');
-            c.setAttribute('aria-pressed', c.classList.contains('selected'));
-            currentPage = 1;
-            if ($('#previewWrap').style.display !== 'none') refreshPreview();
-          };
-          partyListEl.appendChild(c);
-        });
+            const key = partyGroupKey(group.country, group.family);
+            const isSelected = selectedPartyGroups.has(key);
+            const c = document.createElement('button');
+            c.type = 'button';
+            c.className = 'chip' + (isSelected ? ' selected' : '');
+            const familyKey = String(group.family).trim().toLowerCase();
+            const hasDuplicateName = (familyCountries.get(familyKey) || new Set()).size > 1;
+            c.textContent = hasDuplicateName
+              ? `${group.family} (${group.country})`
+              : group.family;
+            c.dataset.key = key;
+            c.dataset.country = group.country;
+            c.dataset.family = group.family;
+            c.setAttribute('aria-pressed', String(isSelected));
+            c.onclick = () => {
+              if (selectedPartyGroups.has(key)) {
+                selectedPartyGroups.delete(key);
+              } else {
+                selectedPartyGroups.add(key);
+              }
+              currentPage = 1;
+              buildChips();
+              if ($('#previewWrap').style.display !== 'none') refreshPreview();
+            };
+            partyListEl.appendChild(c);
+          });
       }
 
       function refreshPreview() {
         const tbody = $('#previewTable tbody');
         tbody.innerHTML = '';
-        if (selectedCountries.size === 0) {
+        if (!selectedCountry) {
           $('#previewWrap').style.display = 'none';
+          updateSelectionSummary([]);
           return;
         }
         $('#previewWrap').style.display = 'block';
 
-        const selParties = $$('.chip.selected', $('#partyList')).map(c => ({
-          country: c.dataset.country,
-          family: c.dataset.family
-        }));
+        let rows = getFilteredRows();
+        updateSelectionSummary(rows);
         const q = $('#partySearch').value.trim().toLowerCase();
-        let rows = partiesDataCombined.filter(r =>
-          selectedCountries.has(r.Country) &&
-          matchesSearch(r, q) &&
-          (selParties.length
-            ? selParties.some(group =>
-                group.country === r.Country &&
-                group.family === (r['Party family'] || r.Party)
-              )
-            : true)
-        );
 
         rows.sort((a, b) => {
           const VA = (a[sortKey] || '').toString();
@@ -1662,6 +1915,7 @@
             'Party leader',
             'Year became leader',
             'Year ended as leader',
+            'Co-leadership',
             'Female leader (0= male; 1 = female)',
             'Interim leader (0= No; 1 =Yes)',
             'Party family',
@@ -1676,7 +1930,6 @@
 
         renderPagination(totalPages);
       }
-
       function renderPagination(totalPages) {
         const pagination = $('#pagination');
         pagination.innerHTML = '';
@@ -1712,32 +1965,19 @@
       }
 
       function downloadExcel() {
-        const selParties = $$('.chip.selected', $('#partyList')).map(c => ({
-          country: c.dataset.country,
-          family: c.dataset.family
-        }));
-        const q = $('#partySearch').value.trim().toLowerCase();
-        const data = partiesDataCombined.filter(r =>
-          selectedCountries.has(r.Country) &&
-          matchesSearch(r, q) &&
-          (selParties.length
-            ? selParties.some(group =>
-                group.country === r.Country &&
-                group.family === (r['Party family'] || r.Party)
-              )
-            : true)
-        )
+        const data = getFilteredRows()
           .map(r => ({
             Country: r.Country,
             Region: r.Region,
             'Regional Party Name': r.Party,
-            'Party leader': r['Party leader'],
-            'Year became leader': numericOrBlank(r['Year became leader']),
-            'Year ended as leader': numericOrBlank(r['Year ended as leader']),
-            'Female leader (0= male; 1 = female)': numericOrBlank(r['Female leader (0= male; 1 = female)']),
-            'Interim leader (0= No; 1 =Yes)': numericOrBlank(r['Interim leader (0= No; 1 =Yes)']),
-            'National Party Name': r['Party family'],
-            Comments: r.Comments
+            'Party Leader': r['Party leader'],
+            Since: numericOrBlank(r['Year became leader']),
+            Until: numericOrBlank(r['Year ended as leader']),
+            'Co-leadership': numericOrBlank(r['Co-leadership']),
+            Female: numericOrBlank(r['Female leader (0= male; 1 = female)']),
+            Interim: numericOrBlank(r['Interim leader (0= No; 1 =Yes)']),
+            'National Sister Party': r['Party family'],
+            Comment: r.Comments
           }));
         if (!data.length) {
           showToast('There are no rows to export');
@@ -1745,10 +1985,9 @@
         }
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Parties');
-        const label = selectedCountries.size === 1 ? Array.from(selectedCountries)[0] : selectedCountries.size + 'countries';
+        const label = selectedCountry;
         XLSX.writeFile(wb, `Parties_${label}.xlsx`);
       }
-
       function setStatus(msg, loading) {
         const el = $('#dataStatus');
         el.innerHTML = '';
@@ -1761,15 +2000,17 @@
       }
 
       // ========== Restore Last Selection ==========
-      const last = localStorage.getItem('lastCountries');
-      if (last) {
+      const lastCountry = localStorage.getItem('lastCountry');
+      if (lastCountry && allCountries.includes(lastCountry)) {
+        selectedCountry = lastCountry;
+      } else {
+        const lastCountries = localStorage.getItem('lastCountries');
         try {
-          selectedCountries = new Set(JSON.parse(last));
+          const legacyCountries = JSON.parse(lastCountries || '[]');
+          selectedCountry = legacyCountries.find(country => allCountries.includes(country)) || '';
         } catch (_) {}
       }
-      renderCountryList();
-      updateSelectedIndicator();
-
+      syncUIAfterCountryChange(false);
       // ========== Keyboard Help on Table Headers ==========
       $$('#previewTable thead th').forEach(th => {
         th.setAttribute('tabindex', '0');
@@ -1783,7 +2024,7 @@
 
       // ========== Persist Selection ==========
       window.addEventListener('beforeunload', () => {
-        localStorage.setItem('lastCountries', JSON.stringify(Array.from(selectedCountries)));
+        localStorage.setItem('lastCountry', selectedCountry);
       });
     })();
   </script>
