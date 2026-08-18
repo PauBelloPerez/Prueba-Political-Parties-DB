@@ -1077,33 +1077,8 @@ margin: 4px -6px 0;
       <!-- Data Table -->
       <div class="table-wrap" id="previewWrap" style="display: none;">
         <table id="previewTable" aria-label="Party data by country">
-          <colgroup>
-            <col style="width: 8%;">
-            <col style="width: 10%;">
-            <col style="width: 12%;">
-            <col style="width: 13%;">
-            <col style="width: 7%;">
-            <col style="width: 7%;">
-            <col style="width: 8%;">
-            <col style="width: 6%;">
-            <col style="width: 6%;">
-            <col style="width: 11%;">
-            <col style="width: 12%;">
-          </colgroup>
           <thead>
-            <tr>
-              <th data-key="Country">Country ▾</th>
-              <th data-key="Region">Region</th>
-              <th data-key="Party">Regional Party Name</th>
-              <th data-key="Party leader">Party Leader</th>
-              <th data-key="Year became leader">Since</th>
-              <th data-key="Year ended as leader">Until</th>
-              <th data-key="Co-leadership">Co-leadership</th>
-              <th data-key="Female leader (0= male; 1 = female)">Female</th>
-              <th data-key="Interim leader (0= No; 1 =Yes)">Interim</th>
-              <th data-key="Party family">National Sister Party</th>
-              <th data-key="Comments">Comment</th>
-            </tr>
+            <tr></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -1160,6 +1135,41 @@ margin: 4px -6px 0;
       });
 
       const isCountryEnabled = country => COUNTRY_ENABLED[country] === true;
+
+      // Preview and export headers follow the terminology of each source dataset.
+      // The second value is the normalized internal key used by filters and sorting.
+      const COUNTRY_COLUMNS = Object.freeze({
+        Australia: [
+          ['Country', 'Country'], ['Region', 'Region'], ['Party', 'Party'],
+          ['Interim', 'Interim leader (0= No; 1 =Yes)'],
+          ['Year became leader', 'Year became leader'], ['Year ended as leader', 'Year ended as leader'],
+          ['Party leader', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
+          ['Party family', 'Party family'], ['Comment', 'Comments']
+        ],
+        Canada: [
+          ['Country', 'Country'], ['Region', 'Region'], ['Regional Party Name', 'Party'],
+          ['Interim', 'Interim leader (0= No; 1 =Yes)'],
+          ['Year became party leader', 'Year became leader'], ['Year ended as party leader', 'Year ended as leader'],
+          ['Party leader', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
+          ['National Sister Party', 'Party family'], ['Co-leadership', 'Co-leadership'], ['Comment', 'Comments']
+        ],
+        Germany: [
+          ['Country', 'Country'], ['Region', 'Region'], ['Party territorial unit', 'Party territorial unit'],
+          ['Regional Party Name', 'Party'], ['Interim', 'Interim leader (0= No; 1 =Yes)'],
+          ['Year became party chair', 'Year became leader'], ['Year ended as party chair', 'Year ended as leader'],
+          ['Party chair', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
+          ['National Party Name', 'Party family'], ['Vernacular Party Name', 'Vernacular Party Name'],
+          ['Co-leadership', 'Co-leadership'], ['Comment', 'Comments']
+        ],
+        Austria: [
+          ['Country', 'Country'], ['Region', 'Region'], ['Party territorial unit', 'Party territorial unit'],
+          ['Regional Party Name', 'Party'], ['Interim', 'Interim leader (0= No; 1 =Yes)'],
+          ['Year became party chair', 'Year became leader'], ['Year ended as party chair', 'Year ended as leader'],
+          ['Party chair', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
+          ['National Party Name', 'Party family'], ['Vernacular Party name', 'Vernacular Party Name'],
+          ['Co-leadership', 'Co-leadership'], ['Comment', 'Comments']
+        ]
+      });
 
       // ========== Utility Functions ==========
       const $ = (sel, root = document) => root.querySelector(sel);
@@ -1241,6 +1251,15 @@ margin: 4px -6px 0;
             'CANADA_Liberal.csv',
             'CANADA_NDP.csv',
             'CANADA_Greens.csv'
+          ]
+        },
+        {
+          country: 'Austria',
+          folder: 'data/AUSTRIA',
+          files: [
+            'AUSTRIA_FPO.csv',
+            'AUSTRIA_OVP.csv',
+            'AUSTRIA_SPO.csv'
           ]
         },
         {
@@ -1535,19 +1554,36 @@ margin: 4px -6px 0;
       btnDownload.addEventListener('click', downloadExcel);
 
       // ========== Sorting ==========
-      $$('#previewTable thead th').forEach(th => {
-        th.addEventListener('click', () => {
-          const key = th.getAttribute('data-key');
-          if (sortKey === key) sortAsc = !sortAsc;
-          else {
-            sortKey = key;
-            sortAsc = true;
-          }
-          refreshPreview();
-          $$('#previewTable thead th').forEach(h => h.textContent = h.textContent.replace(/[▴▾]\s*$/, ''));
-          th.textContent = th.textContent.replace(/[▴▾]\s*$/, '') + (sortAsc ? ' ▾' : ' ▴');
+      function activeCountryColumns() {
+        return COUNTRY_COLUMNS[selectedCountry] || COUNTRY_COLUMNS.Australia;
+      }
+
+      function renderTableHeader(columns) {
+        const row = $('#previewTable thead tr');
+        row.innerHTML = '';
+        columns.forEach(([header, key]) => {
+          const th = document.createElement('th');
+          th.dataset.key = key;
+          th.tabIndex = 0;
+          th.textContent = header + (sortKey === key ? (sortAsc ? ' ▾' : ' ▴') : '');
+          const applySort = () => {
+            if (sortKey === key) sortAsc = !sortAsc;
+            else {
+              sortKey = key;
+              sortAsc = true;
+            }
+            refreshPreview();
+          };
+          th.addEventListener('click', applySort);
+          th.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              applySort();
+            }
+          });
+          row.appendChild(th);
         });
-      });
+      }
 
       // ========== Data Loading ==========
       setStatus('Loading data', true);
@@ -1583,6 +1619,7 @@ margin: 4px -6px 0;
           Region: firstValue(r, ['Region']),
           Comments: firstValue(r, ['Comments', 'Comment']),
           Party: firstValue(r, ['Party', 'Regional Party Name', 'PTYNAME']),
+          'Party territorial unit': firstValue(r, ['Party territorial unit']),
           'Interim leader (0= No; 1 =Yes)': numericOrBlank(firstValue(r, ['Interim leader (0= No; 1 =Yes)', 'Interim'])),
           'Year became leader': numericOrBlank(firstValue(r, ['Year became leader', 'Year became party leader', 'Year became party chair', 'Since'])),
           'Year ended as leader': numericOrBlank(firstValue(r, ['Year ended as leader', 'Year ended as party leader', 'Year ended as party chair', 'Until'])),
@@ -1594,7 +1631,8 @@ margin: 4px -6px 0;
             'Female chair'
           ])),
           'Co-leadership': numericOrBlank(firstValue(r, ['Co-leadership'])),
-          'Party family': firstValue(r, ['Party family', 'National Sister Party', 'National Party Name', 'Party', 'PTYNAME'])
+          'Party family': firstValue(r, ['Party family', 'National Sister Party', 'National Party Name', 'Party', 'PTYNAME']),
+          'Vernacular Party Name': firstValue(r, ['Vernacular Party Name', 'Vernacular Party name'])
         };
       }
 
@@ -1918,6 +1956,8 @@ margin: 4px -6px 0;
           return;
         }
         $('#previewWrap').style.display = 'block';
+        const columns = activeCountryColumns();
+        renderTableHeader(columns);
 
         let rows = getFilteredRows();
         updateSelectionSummary(rows);
@@ -1938,21 +1978,9 @@ margin: 4px -6px 0;
 
         pageRows.forEach(r => {
           const tr = document.createElement('tr');
-          [
-            'Country',
-            'Region',
-            'Party',
-            'Party leader',
-            'Year became leader',
-            'Year ended as leader',
-            'Co-leadership',
-            'Female leader (0= male; 1 = female)',
-            'Interim leader (0= No; 1 =Yes)',
-            'Party family',
-            'Comments'
-          ].forEach(k => {
+          columns.forEach(([, key]) => {
             const td = document.createElement('td');
-            appendHighlightedText(td, r[k], q);
+            appendHighlightedText(td, r[key], q);
             tr.appendChild(td);
           });
           tbody.appendChild(tr);
@@ -1995,20 +2023,9 @@ margin: 4px -6px 0;
       }
 
       function downloadExcel() {
+        const columns = activeCountryColumns();
         const data = getFilteredRows()
-          .map(r => ({
-            Country: r.Country,
-            Region: r.Region,
-            'Regional Party Name': r.Party,
-            'Party Leader': r['Party leader'],
-            Since: numericOrBlank(r['Year became leader']),
-            Until: numericOrBlank(r['Year ended as leader']),
-            'Co-leadership': numericOrBlank(r['Co-leadership']),
-            Female: numericOrBlank(r['Female leader (0= male; 1 = female)']),
-            Interim: numericOrBlank(r['Interim leader (0= No; 1 =Yes)']),
-            'National Sister Party': r['Party family'],
-            Comment: r.Comments
-          }));
+          .map(r => Object.fromEntries(columns.map(([header, key]) => [header, r[key]])));
         if (!data.length) {
           showToast('There are no rows to export');
           return;
@@ -2041,17 +2058,6 @@ margin: 4px -6px 0;
         } catch (_) {}
       }
       syncUIAfterCountryChange(false);
-      // ========== Keyboard Help on Table Headers ==========
-      $$('#previewTable thead th').forEach(th => {
-        th.setAttribute('tabindex', '0');
-        th.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            th.click();
-          }
-        });
-      });
-
       // ========== Persist Selection ==========
       window.addEventListener('beforeunload', () => {
         localStorage.setItem('lastCountry', selectedCountry);
