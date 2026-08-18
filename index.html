@@ -1143,6 +1143,24 @@ margin: 4px -6px 0;
     (function() {
       'use strict';
 
+      // ========== Manual Country Switches ==========
+      // Change a value to true or false here to publish or hide a country.
+      // Countries set to false are not shown on the map/list and their data is not loaded.
+      const COUNTRY_ENABLED = Object.freeze({
+        Austria: true,
+        France: true,
+        Germany: true,
+        Italy: true,
+        Portugal: true,
+        Spain: true,
+        Switzerland: true,
+        'United Kingdom': true,
+        Canada: true,
+        Australia: true
+      });
+
+      const isCountryEnabled = country => COUNTRY_ENABLED[country] === true;
+
       // ========== Utility Functions ==========
       const $ = (sel, root = document) => root.querySelector(sel);
       const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -1174,27 +1192,32 @@ margin: 4px -6px 0;
           name: 'Europe',
           file: 'europe.geojson',
           prop: 'NAME',
+          countries: ['Austria', 'France', 'Germany', 'Italy', 'Portugal', 'Spain', 'Switzerland', 'United Kingdom'],
           bounds: [[20, -40], [72, 50]],
           zoom: 4,
           style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 },
-          filter: f => ['Austria', 'France', 'Germany', 'Italy', 'Portugal', 'Spain', 'Switzerland', 'United Kingdom'].includes(f.properties.NAME)
+          filter: f => isCountryEnabled(f.properties.NAME)
         },
         {
           name: 'Canada',
           file: 'ca.json',
           prop: 'name',
+          countries: ['Canada'],
           bounds: [[20, -141], [83, -52]],
           center: [20, -96],
           zoom: 3,
-          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 }
+          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 },
+          filter: f => isCountryEnabled(f.properties.name)
         },
         {
           name: 'Australia',
           file: 'au.json',
           prop: 'name',
+          countries: ['Australia'],
           bounds: [[-44, 112], [-10, 154]],
           zoom: 4,
-          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 }
+          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 },
+          filter: f => isCountryEnabled(f.properties.name)
         }
       ];
 
@@ -1219,23 +1242,19 @@ margin: 4px -6px 0;
             'CANADA_NDP.csv',
             'CANADA_Greens.csv'
           ]
+        },
+        {
+          country: 'Germany',
+          folder: 'data/GERMANY',
+          files: [
+            'GERMANY_AfD.csv',
+            'GERMANY_CDU_CSU.csv',
+            'GERMANY_SPD.csv'
+          ]
         }
-      ];
+      ].filter(source => isCountryEnabled(source.country));
 
-      // Countries shown in the interface. Data loading remains restricted
-      // to the countries explicitly configured in countryDataSources.
-      const allCountries = [
-        'Austria',
-        'France',
-        'Germany',
-        'Italy',
-        'Portugal',
-        'Spain',
-        'Switzerland',
-        'United Kingdom',
-        'Canada',
-        'Australia'
-      ];
+      const allCountries = Object.keys(COUNTRY_ENABLED).filter(isCountryEnabled);
 
       // ========== State Variables ==========
       let currentMapIdx = 0;
@@ -1354,7 +1373,16 @@ margin: 4px -6px 0;
 
       // ========== Scope Segmented Control ==========
       const segs = $$('.segmented .seg');
+      const mapScopeEnabled = cfg => cfg.countries.some(isCountryEnabled);
+      segs.forEach((button, idx) => {
+        button.hidden = !mapScopeEnabled(maps[idx]);
+      });
+      const firstEnabledMapIdx = maps.findIndex(mapScopeEnabled);
+      if (firstEnabledMapIdx >= 0 && !mapScopeEnabled(maps[currentMapIdx])) {
+        currentMapIdx = firstEnabledMapIdx;
+      }
       segs.forEach((b, idx) => b.addEventListener('click', () => {
+        if (!mapScopeEnabled(maps[idx])) return;
         currentMapIdx = idx;
         updateSegs();
         loadMap();
@@ -1556,16 +1584,17 @@ margin: 4px -6px 0;
           Comments: firstValue(r, ['Comments', 'Comment']),
           Party: firstValue(r, ['Party', 'Regional Party Name', 'PTYNAME']),
           'Interim leader (0= No; 1 =Yes)': numericOrBlank(firstValue(r, ['Interim leader (0= No; 1 =Yes)', 'Interim'])),
-          'Year became leader': numericOrBlank(firstValue(r, ['Year became leader', 'Year became party leader', 'Since'])),
-          'Year ended as leader': numericOrBlank(firstValue(r, ['Year ended as leader', 'Year ended as party leader', 'Until'])),
-          'Party leader': firstValue(r, ['Party leader', 'CR20PPGLDR']),
+          'Year became leader': numericOrBlank(firstValue(r, ['Year became leader', 'Year became party leader', 'Year became party chair', 'Since'])),
+          'Year ended as leader': numericOrBlank(firstValue(r, ['Year ended as leader', 'Year ended as party leader', 'Year ended as party chair', 'Until'])),
+          'Party leader': firstValue(r, ['Party leader', 'Party chair', 'CR20PPGLDR']),
           'Female leader (0= male; 1 = female)': numericOrBlank(firstValue(r, [
             'Female leader (0= male; 1 = female)',
             'Female party leader (0 = male; 1 = female)',
-            'Female party leader'
+            'Female party leader',
+            'Female chair'
           ])),
           'Co-leadership': numericOrBlank(firstValue(r, ['Co-leadership'])),
-          'Party family': firstValue(r, ['Party family', 'National Sister Party', 'Party', 'PTYNAME'])
+          'Party family': firstValue(r, ['Party family', 'National Sister Party', 'National Party Name', 'Party', 'PTYNAME'])
         };
       }
 
@@ -1642,6 +1671,7 @@ margin: 4px -6px 0;
         if (!response.ok) throw new Error('Failed to load data/Updates.csv');
         const parsed = Papa.parse(await response.text(), {
           header: true,
+          delimiter: ';',
           skipEmptyLines: true
         });
         if (parsed.errors && parsed.errors.length) {
