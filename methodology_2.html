@@ -6,7 +6,7 @@
   <title>Methodology – Regional Party Leadership Database</title>
   <meta name="description" content="Definitions, inclusion criteria, data sources and update process for the Regional Party Leadership Database." />
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet" />
 
   <style>
     @font-face {
@@ -19,269 +19,254 @@
       font-display: swap;
     }
 
-    /* ========== Design Tokens ========== */
+    /* ========== Variables (shared with index) ========== */
     :root {
-      --bg: #F4F0EA;
-      --card: #FDFAF5;
-      --text: #1C1714;
-      --text-secondary: #6B5D52;
-      --muted: #9C8D82;
-      --border: #D8CFC4;
-      --border-light: #EDE7DF;
+      --sea: #0E3538;
+      --sea-deep: #092629;
+      --white: #FFFDF8;
+      --ink: #101B1C;
+      --body: #3E4746;
+      --soft: #566867;
+      --mist: #ECEEE6;
+      --mist-deep: #DDE1D8;
 
       --brand: #C8102E;
-      --brand-hover: #C8102E;
-      --brand-light: #F5E4E6;
+      --brand-dark: #A50D26;
+      --brand-tint: #FBE9EC;
 
-      --radius: 4px;
-      --radius-lg: 6px;
-      --shadow: 0 1px 4px rgba(28, 23, 20, 0.07), 0 1px 2px rgba(28, 23, 20, 0.05);
-      --shadow-lg: 0 8px 28px rgba(28, 23, 20, 0.12), 0 3px 8px rgba(28, 23, 20, 0.06);
-
-      --font: 'DM Sans', system-ui, -apple-system, sans-serif;
-      --font-display: 'Playfair Display', Georgia, serif;
-      --font-mono: 'DM Mono', 'Courier New', monospace;
+      --font: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
       --font-upf: 'Excelsor', Georgia, serif;
-      --upf-red: #C8102E;
 
-      --header-height: 64px;
+      --shadow-hard: 4px 4px 0 rgba(7, 26, 28, 0.85);
     }
 
-    /* ========== Reset ========== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--sea);
+      color: var(--body);
       font-family: var(--font);
-      line-height: 1.6;
+      font-size: 15px;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ========== Header ========== */
-    .header {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      border-top: 4px solid var(--brand);
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 900;
-      height: var(--header-height);
-    }
+    ::selection { background: var(--brand); color: var(--white); }
+    button { font-family: var(--font); }
+    a { color: inherit; }
 
-    .header-container {
-      max-width: 1400px;
+    /* ========== Floating top bar ========== */
+    .topbar {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 24px;
-      height: 100%;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      column-gap: 28px;
+      row-gap: 12px;
+      padding: 22px 24px 0;
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: var(--text);
-      transition: color 0.2s;
-    }
-    .logo:hover { color: var(--brand); }
+    .brand { text-decoration: none; display: block; max-width: 340px; }
 
-    .logo-icon {
-      width: 56px;
-      height: 36px;
+    .brand-name {
+      display: block;
+      color: var(--white);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+    }
+
+    .brand:hover .brand-name {
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-decoration-color: var(--brand);
+      text-underline-offset: 5px;
+    }
+
+    .brand-upf {
+      display: inline-block;
+      margin-top: 9px;
       background: var(--brand);
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 11px;
-      font-family: var(--font-mono);
-      letter-spacing: 0.05em;
-      flex-shrink: 0;
-    }
-
-    .logo-title {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-    }
-    .logo-title strong {
-      font-family: var(--font-display);
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .logo-title span {
-      font-size: 14px;
+      color: #fff;
       font-family: var(--font-upf);
       font-weight: 700;
-      color: var(--upf-red);
-      letter-spacing: 0.02em;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 3px 9px 4px;
+      border-radius: 4px;
     }
 
     .nav {
       display: flex;
-      gap: 8px;
+      gap: 22px;
       align-items: center;
+      margin-left: auto;
+      padding-top: 12px;
     }
 
     .nav-link {
-      padding: 6px 14px;
       text-decoration: none;
-      color: var(--text-secondary);
-      font-weight: 500;
-      font-size: 13px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      border-radius: var(--radius);
-      transition: all 0.2s;
-      position: relative;
+      color: rgba(255, 253, 248, 0.72);
+      font-size: 13.5px;
+      font-weight: 600;
     }
-    .nav-link:hover { color: var(--brand); background: var(--brand-light); }
-    .nav-link.active { color: var(--brand); font-weight: 600; }
-    .nav-link.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 14px; right: 14px;
-      height: 2px;
-      background: var(--brand);
+
+    .nav-link:hover { color: var(--white); }
+
+    .nav-link.active {
+      color: var(--white);
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-decoration-color: var(--brand);
+      text-underline-offset: 6px;
     }
 
     .menu-toggle {
       display: none;
       background: transparent;
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      border-radius: var(--radius);
+      border: 2px solid rgba(255, 253, 248, 0.6);
+      border-radius: 8px;
+      color: var(--white);
+      padding: 4px 11px;
+      font-size: 17px;
       cursor: pointer;
-      color: var(--text);
-      font-size: 20px;
+      margin-left: auto;
     }
 
-    /* ========== Page layout ========== */
-    .main-content {
-      max-width: 1400px;
+    /* ========== Hero ========== */
+    .hero {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 48px 24px 80px;
-      min-height: calc(100vh - var(--header-height) - 100px);
+      padding: 44px 24px 92px;
     }
 
-    .page-header {
-      margin-bottom: 48px;
-      padding-bottom: 24px;
-      border-bottom: 2px solid var(--text);
-      max-width: 860px;
+    .page-kicker {
+      display: inline-block;
+      color: rgba(255, 253, 248, 0.6);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 16px;
     }
 
     .page-title {
-      font-size: 44px;
-      font-weight: 700;
-      font-family: var(--font-display);
-      color: var(--text);
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      margin-bottom: 12px;
+      color: var(--white);
+      font-size: clamp(40px, 6.5vw, 72px);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1;
     }
 
     .page-description {
-      font-size: 16px;
-      color: var(--text-secondary);
-      font-weight: 300;
-      line-height: 1.75;
-      max-width: 580px;
+      color: rgba(255, 253, 248, 0.75);
+      font-size: 16.5px;
+      line-height: 1.6;
+      max-width: 600px;
+      margin-top: 20px;
     }
 
+    /* ========== Sheet ========== */
+    .sheet {
+      position: relative;
+      z-index: 2;
+      background: var(--white);
+      border-radius: 28px 28px 0 0;
+      box-shadow: 0 -20px 50px rgba(9, 38, 41, 0.4);
+      margin-top: -48px;
+      padding: 54px clamp(22px, 5vw, 72px) 40px;
+      min-height: 60vh;
+    }
+
+    .sheet-inner { max-width: 1120px; margin: 0 auto; }
+
     /* ========== Two-column layout ========== */
-    .methodology-grid {
+    .two-col {
       display: grid;
       grid-template-columns: 1fr 260px;
       gap: 56px;
       align-items: start;
-      max-width: 1100px;
     }
 
     /* ========== Sections ========== */
-    .method-section {
-      margin-bottom: 52px;
-    }
-    .method-section:last-child { margin-bottom: 0; }
+    .section { margin-bottom: 56px; scroll-margin-top: 24px; }
+    .section:last-child { margin-bottom: 0; }
 
     .section-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      margin-bottom: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--brand);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 9px;
+      height: 9px;
+      background: var(--brand);
+      border-radius: 2px;
     }
 
     .section-heading {
-      font-family: var(--font-display);
+      color: var(--ink);
       font-size: 26px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 16px;
     }
 
     .section-body {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.8;
-      font-weight: 300;
+      font-size: 15.5px;
+      color: var(--body);
+      line-height: 1.75;
     }
+
     .section-body p + p { margin-top: 14px; }
+
     .section-body a {
       color: var(--brand);
-      text-decoration: none;
-      border-bottom: 1px solid var(--brand-light);
-      transition: border-color 0.2s;
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 2px;
     }
-    .section-body a:hover { border-color: var(--brand); }
 
-    /* ========== Definition list ========== */
+    /* ========== Definition list (zebra card, no hairlines) ========== */
     /* Para añadir términos: duplicar un .def-item dentro de .def-list */
     .def-list {
-      margin-top: 8px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
+      margin-top: 20px;
+      border-radius: 14px;
       overflow: hidden;
+      box-shadow: var(--shadow-hard);
     }
 
     .def-item {
       display: grid;
-      grid-template-columns: 160px 1fr;
-      border-bottom: 1px solid var(--border-light);
+      grid-template-columns: 170px 1fr;
+      gap: 18px;
+      padding: 16px 20px;
+      background: var(--mist);
     }
-    .def-item:last-child { border-bottom: 0; }
+
+    .def-item:nth-child(even) { background: var(--mist-deep); }
 
     .def-term {
-      padding: 14px 16px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text);
-      background: var(--bg);
-      border-right: 1px solid var(--border-light);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.005em;
       line-height: 1.5;
     }
 
     .def-desc {
-      padding: 14px 16px;
       font-size: 14px;
-      color: var(--text-secondary);
+      color: var(--soft);
       line-height: 1.65;
-      background: var(--card);
     }
 
     /* ========== Sources list ========== */
@@ -289,334 +274,308 @@
     .source-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 4px;
+      gap: 14px;
+      margin-top: 20px;
     }
 
     .source-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 16px 18px;
-      box-shadow: var(--shadow);
+      background: var(--mist);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow-hard);
     }
 
     .source-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      margin-bottom: 4px;
+      font-weight: 800;
+      font-size: 14.5px;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-bottom: 5px;
     }
 
     .source-desc {
       font-size: 13px;
-      color: var(--muted);
-      line-height: 1.55;
+      color: var(--soft);
+      line-height: 1.6;
     }
 
     .source-url {
       display: inline-block;
-      margin-top: 8px;
-      font-size: 12px;
-      font-family: var(--font-mono);
+      margin-top: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--brand);
       text-decoration: none;
       word-break: break-all;
     }
-    .source-url:hover { text-decoration: underline; }
 
-    /* ========== Divider ========== */
-    .section-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 44px 0;
+    .source-url:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
     }
 
     /* ========== Placeholder ========== */
     .placeholder-block {
-      border: 1.5px dashed var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px 24px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      font-family: var(--font-mono);
-      line-height: 1.6;
-    }
-    .placeholder-block strong {
-      display: block;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 6px;
-      color: var(--border);
+      background: var(--mist);
+      border-radius: 12px;
+      padding: 26px 24px;
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.65;
     }
 
-    /* ========== TOC sidebar ========== */
+    .placeholder-block strong {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--brand);
+      padding: 2px 8px 3px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    /* ========== TOC sidebar (petrol, sticky) ========== */
     .toc-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
+      background: var(--sea);
+      border-radius: 16px;
+      box-shadow: 8px 8px 0 rgba(7, 26, 28, 0.3);
       overflow: hidden;
       position: sticky;
-      top: calc(var(--header-height) + 24px);
+      top: 24px;
+      padding: 8px;
     }
 
-    .toc-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      background: var(--text);
-    }
-    .toc-header h3 {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 500;
-      color: #F4F0EA;
+    .toc-card h3 {
+      color: rgba(255, 253, 248, 0.55);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    .toc-body {
-      padding: 8px 0;
+      padding: 12px 12px 10px;
     }
 
     /* Para añadir entradas al TOC: duplicar un .toc-link */
     .toc-link {
       display: block;
-      padding: 9px 18px;
+      padding: 9px 12px;
+      border-radius: 9px;
       font-size: 13px;
-      color: var(--text-secondary);
-      text-decoration: none;
-      border-left: 2px solid transparent;
-      transition: all 0.15s;
-    }
-    .toc-link:hover {
-      color: var(--brand);
-      background: var(--brand-light);
-      border-left-color: var(--brand);
-    }
-    .toc-link.active {
-      color: var(--brand);
       font-weight: 600;
-      border-left-color: var(--brand);
-      background: var(--brand-light);
+      color: rgba(255, 253, 248, 0.7);
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
     }
 
-    /* ========== Site Footer ========== */
-    .site-footer {
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      padding: 32px 24px;
+    .toc-link:hover { color: var(--white); background: rgba(255, 255, 255, 0.06); }
+
+    .toc-link.active {
+      color: var(--white);
+      background: var(--brand);
     }
+
+    /* ========== Footer ========== */
+    .site-footer { margin-top: 64px; }
 
     .footer-container {
-      max-width: 1400px;
+      max-width: 1120px;
       margin: 0 auto;
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 12.5px;
+      color: var(--soft);
     }
-    .footer-container a { color: var(--brand); text-decoration: none; }
-    .footer-container a:hover { text-decoration: underline; }
+
+    .footer-links { display: flex; gap: 20px; }
+
+    .footer-container a {
+      color: var(--soft);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .footer-container a:hover {
+      color: var(--brand);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
 
     /* ========== Responsive ========== */
     @media (max-width: 900px) {
-      .methodology-grid { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; gap: 40px; }
       .toc-card { position: static; }
     }
 
     @media (max-width: 768px) {
-      .header-container { padding: 0 16px; }
+      .topbar { padding: 18px 18px 0; }
+      .brand-name { font-size: 20px; }
+      .menu-toggle { display: block; }
+
       .nav {
         display: none;
-        position: absolute;
-        top: var(--header-height);
-        left: 0; right: 0;
-        background: var(--card);
-        border-bottom: 1px solid var(--border);
-        box-shadow: var(--shadow-lg);
+        width: 100%;
         flex-direction: column;
-        padding: 16px;
-        gap: 4px;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 6px 0 4px;
+        order: 4;
+        margin-left: 0;
       }
+
       .nav.mobile-open { display: flex; }
-      .nav-link { width: 100%; text-align: left; }
-      .nav-link.active::after { display: none; }
-      .menu-toggle { display: block; }
-      .main-content { padding: 32px 16px 64px; }
-      .page-title { font-size: 32px; }
-      .def-item { grid-template-columns: 1fr; }
-      .def-term { border-right: 0; border-bottom: 1px solid var(--border-light); }
+
+      .hero { padding: 30px 18px 78px; }
+      .sheet { padding: 40px 20px 32px; border-radius: 24px 24px 0 0; }
+      .def-item { grid-template-columns: 1fr; gap: 6px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ========== Header ========== -->
-  <header class="header">
-    <div class="header-container">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">RePaLeD</div>
-        <div class="logo-title">
-          <strong>Regional Party Leadership Database</strong>
-          <span>Universitat Pompeu Fabra</span>
-        </div>
-      </a>
+  <!-- ========== Top bar ========== -->
+  <div class="topbar">
+    <a href="index.html" class="brand">
+      <span class="brand-name">Regional Party Leadership Database</span>
+      <span class="brand-upf">Universitat Pompeu Fabra</span>
+    </a>
 
-      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
 
-      <nav class="nav" id="mainNav">
-        <a href="index.html" class="nav-link">Data</a>
-        <a href="about_2.html" class="nav-link">About</a>
-        <a href="methodology_2.html" class="nav-link active">Methodology</a>
-        <a href="contact_2.html" class="nav-link">Contact</a>
-      </nav>
-    </div>
+    <nav class="nav" id="mainNav">
+      <a href="index.html" class="nav-link">Data</a>
+      <a href="about_2.html" class="nav-link">About</a>
+      <a href="methodology_2.html" class="nav-link active">Methodology</a>
+      <a href="contact_2.html" class="nav-link">Contact</a>
+    </nav>
+  </div>
+
+  <!-- ========== Hero ========== -->
+  <header class="hero">
+    <span class="page-kicker">How the dataset is built</span>
+    <h1 class="page-title">Methodology</h1>
+    <p class="page-description">
+      Definitions, inclusion criteria, data sources and how the dataset is maintained over time.
+    </p>
   </header>
 
-  <!-- ========== Main ========== -->
-  <main class="main-content">
+  <!-- ========== Sheet ========== -->
+  <main class="sheet">
+    <div class="sheet-inner">
+      <div class="two-col">
 
-    <div class="page-header">
-      <h1 class="page-title">Methodology</h1>
-      <p class="page-description">
-        Definitions, inclusion criteria, data sources and how the dataset is maintained over time.
-      </p>
-    </div>
+        <!-- ===== LEFT: content ===== -->
+        <div>
 
-    <div class="methodology-grid">
+          <!-- SECTION: Definitions -->
+          <!-- Para añadir términos: duplicar .def-item dentro de .def-list -->
+          <div class="section" id="sec-definitions">
+            <div class="section-label">01 — definitions</div>
+            <h2 class="section-heading">Key concepts and criteria</h2>
+            <div class="section-body">
+              <p>The following definitions govern what is included in the database and how ambiguous cases are handled.</p>
+            </div>
+            <div class="def-list">
 
-      <!-- ===== LEFT: content ===== -->
-      <div>
-
-        <!-- SECTION: Definitions -->
-        <!-- Para añadir términos: duplicar .def-item dentro de .def-list -->
-        <div class="method-section" id="sec-definitions">
-          <div class="section-label">01 — Definitions</div>
-          <h2 class="section-heading">Key concepts and criteria</h2>
-          <div class="section-body">
-            <p>The following definitions govern what is included in the database and how ambiguous cases are handled.</p>
-          </div>
-          <div class="def-list" style="margin-top: 20px;">
-
-            <div class="def-item">
-              <div class="def-term">Party</div>
-              <div class="def-desc">
-                <!-- Añadir definición aquí -->
-                <span style="color: var(--border); font-style: italic;">Definition pending.</span>
+              <div class="def-item">
+                <div class="def-term">Party</div>
+                <div class="def-desc">
+                  <span style="color: var(--mist-deep); font-style: italic;">Definition pending.</span>
+                </div>
               </div>
-            </div>
 
-            <div class="def-item">
-              <div class="def-term">Leader</div>
-              <div class="def-desc">
-                <!-- Añadir definición aquí -->
-                <span style="color: var(--border); font-style: italic;">Definition pending.</span>
+              <div class="def-item">
+                <div class="def-term">Leader</div>
+                <div class="def-desc">
+                  <span style="color: var(--mist-deep); font-style: italic;">Definition pending.</span>
+                </div>
               </div>
-            </div>
 
-            <div class="def-item">
-              <div class="def-term">Region</div>
-              <div class="def-desc">
-                <!-- Añadir definición aquí -->
-                <span style="color: var(--border); font-style: italic;">Definition pending.</span>
+              <div class="def-item">
+                <div class="def-term">Region</div>
+                <div class="def-desc">
+                  <span style="color: var(--mist-deep); font-style: italic;">Definition pending.</span>
+                </div>
               </div>
+
+              <!-- Añadir más definiciones aquí -->
+
             </div>
-
-            <!-- Añadir más definiciones aquí -->
-
           </div>
-        </div>
 
-        <hr class="section-divider" />
-
-        <!-- SECTION: Inclusion criteria -->
-        <div class="method-section" id="sec-criteria">
-          <div class="section-label">02 — Inclusion criteria</div>
-          <h2 class="section-heading">What gets included and what doesn't</h2>
-          <div class="section-body">
+          <!-- SECTION: Inclusion criteria -->
+          <div class="section" id="sec-criteria">
+            <div class="section-label">02 — inclusion criteria</div>
+            <h2 class="section-heading">What gets included and what doesn't</h2>
             <div class="placeholder-block">
               <strong>Pendiente</strong>
-              Criterios de inclusión: umbrales electorales, tipos de liderazgo reconocidos, tratamiento de partidos coaligados, etc.
+              <div>Criterios de inclusión: umbrales electorales, tipos de liderazgo reconocidos, tratamiento de partidos coaligados, etc.</div>
             </div>
           </div>
-        </div>
 
-        <hr class="section-divider" />
-
-        <!-- SECTION: Data sources -->
-        <!-- Para añadir fuentes: duplicar .source-item dentro de .source-list -->
-        <div class="method-section" id="sec-sources">
-          <div class="section-label">03 — Data sources</div>
-          <h2 class="section-heading">Where the data comes from</h2>
-          <div class="section-body">
-            <p>Data is drawn from primary sources wherever possible, prioritising official institutional records.</p>
-          </div>
-          <div class="source-list" style="margin-top: 20px;">
-
-            <div class="source-item">
-              <div class="source-name">Source name</div>
-              <div class="source-desc">Brief description of what this source covers and how it is used.</div>
-              <a href="#" class="source-url">https://example.com</a>
+          <!-- SECTION: Data sources -->
+          <!-- Para añadir fuentes: duplicar .source-item dentro de .source-list -->
+          <div class="section" id="sec-sources">
+            <div class="section-label">03 — data sources</div>
+            <h2 class="section-heading">Where the data comes from</h2>
+            <div class="section-body">
+              <p>Data is drawn from primary sources wherever possible, prioritising official institutional records.</p>
             </div>
+            <div class="source-list">
 
-            <!-- Añadir más fuentes aquí -->
+              <div class="source-item">
+                <div class="source-name">Source name</div>
+                <div class="source-desc">Brief description of what this source covers and how it is used.</div>
+                <a href="#" class="source-url">https://example.com</a>
+              </div>
 
+              <!-- Añadir más fuentes aquí -->
+
+            </div>
           </div>
-        </div>
 
-        <hr class="section-divider" />
-
-        <!-- SECTION: Update process -->
-        <div class="method-section" id="sec-updates">
-          <div class="section-label">04 — Updates</div>
-          <h2 class="section-heading">How and when the data is updated</h2>
-          <div class="section-body">
+          <!-- SECTION: Update process -->
+          <div class="section" id="sec-updates">
+            <div class="section-label">04 — updates</div>
+            <h2 class="section-heading">How and when the data is updated</h2>
             <div class="placeholder-block">
               <strong>Pendiente</strong>
-              Frecuencia de actualización, qué desencadena una revisión, significado del campo "last updated".
+              <div>Frecuencia de actualización, qué desencadena una revisión, significado del campo "last updated".</div>
             </div>
           </div>
-        </div>
 
-        <hr class="section-divider" />
-
-        <!-- SECTION: Limitations -->
-        <div class="method-section" id="sec-limitations">
-          <div class="section-label">05 — Limitations</div>
-          <h2 class="section-heading">Known limitations and caveats</h2>
-          <div class="section-body">
+          <!-- SECTION: Limitations -->
+          <div class="section" id="sec-limitations">
+            <div class="section-label">05 — limitations</div>
+            <h2 class="section-heading">Known limitations and caveats</h2>
             <div class="placeholder-block">
               <strong>Pendiente</strong>
-              Limitaciones conocidas: líderes interinos, variaciones de nombre entre idiomas, roles en coalición, fuentes con retraso, etc.
+              <div>Limitaciones conocidas: líderes interinos, variaciones de nombre entre idiomas, roles en coalición, fuentes con retraso, etc.</div>
             </div>
           </div>
-        </div>
 
-        <hr class="section-divider" />
-
-        <!-- SECTION: Citation -->
-        <div class="method-section" id="sec-citation">
-          <div class="section-label">06 — Citation</div>
-          <h2 class="section-heading">How to cite this dataset</h2>
-          <div class="section-body">
+          <!-- SECTION: Citation -->
+          <div class="section" id="sec-citation">
+            <div class="section-label">06 — citation</div>
+            <h2 class="section-heading">How to cite this dataset</h2>
             <div class="placeholder-block">
               <strong>Pendiente</strong>
-              Formato de cita recomendado (APA, BibTeX, etc.).
+              <div>Formato de cita recomendado (APA, BibTeX, etc.).</div>
             </div>
           </div>
-        </div>
 
-      </div><!-- /left column -->
+        </div><!-- /left column -->
 
-      <!-- ===== RIGHT: Table of contents ===== -->
-      <aside>
-        <div class="toc-card">
-          <div class="toc-header">
+        <!-- ===== RIGHT: Table of contents ===== -->
+        <aside>
+          <div class="toc-card">
             <h3>Contents</h3>
-          </div>
-          <div class="toc-body">
             <!-- Para añadir entradas: duplicar .toc-link y actualizar href e id de sección -->
             <a href="#sec-definitions" class="toc-link">01 — Definitions</a>
             <a href="#sec-criteria" class="toc-link">02 — Inclusion criteria</a>
@@ -625,24 +584,24 @@
             <a href="#sec-limitations" class="toc-link">05 — Limitations</a>
             <a href="#sec-citation" class="toc-link">06 — Citation</a>
           </div>
+        </aside>
+
+      </div><!-- /two-col -->
+
+      <!-- ========== Footer ========== -->
+      <footer class="site-footer">
+        <div class="footer-container">
+          <p>© 2026 Regional Party Leadership Database · Universitat Pompeu Fabra</p>
+          <div class="footer-links">
+            <a href="about_2.html">About</a>
+            <a href="methodology_2.html">Methodology</a>
+            <a href="contact_2.html">Contact</a>
+          </div>
         </div>
-      </aside>
+      </footer>
 
-    </div><!-- /methodology-grid -->
-
+    </div><!-- /sheet-inner -->
   </main>
-
-  <!-- ========== Footer ========== -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <p>&copy; 2026 Regional Party Leadership Database. Universitat Pompeu Fabra.</p>
-      <p style="margin-top: 8px;">
-        <a href="about_2.html">About</a> ·
-        <a href="methodology_2.html">Methodology</a> ·
-        <a href="contact_2.html">Contact</a>
-      </p>
-    </div>
-  </footer>
 
   <script>
     // Mobile menu
@@ -651,7 +610,7 @@
     });
 
     // TOC: highlight active section on scroll
-    const sections = document.querySelectorAll('.method-section[id]');
+    const sections = document.querySelectorAll('.section[id]');
     const tocLinks = document.querySelectorAll('.toc-link');
 
     const observer = new IntersectionObserver((entries) => {
