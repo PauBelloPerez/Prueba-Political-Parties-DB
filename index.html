@@ -1724,21 +1724,39 @@ margin: 4px -6px 0;
       }
 
       Promise.all([
-        Promise.all(
+        Promise.allSettled(
           countryDataSources.flatMap(source =>
             source.files.map(file => loadCountryDataFile(source, file))
           )
         ),
         loadUpdates().catch(() => new Map())
       ])
-        .then(([countryGroups, updates]) => {
+        .then(([countryResults, updates]) => {
+          const countryGroups = countryResults
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value);
+          const failedFiles = countryResults
+            .filter(result => result.status === 'rejected')
+            .map(result => result.reason?.message || 'Unknown data file');
+
+          if (!countryGroups.length) {
+            throw new Error('No data files could be loaded');
+          }
+
           updatesIndex = updates;
           partiesDataMain = [];
           partiesDataCombined = countryGroups.flat();
           hydrateIndex(partiesDataCombined);
           updateSummaryStats(partiesDataCombined);
-          setStatus('All data loaded');
+          setStatus(failedFiles.length
+            ? `Data loaded with ${failedFiles.length} file error${failedFiles.length === 1 ? '' : 's'}`
+            : 'All data loaded');
           syncUIAfterCountryChange(false);
+
+          if (failedFiles.length) {
+            console.error('Data files not loaded:', failedFiles);
+            showToast(`Some data files could not be loaded: ${failedFiles.join('; ')}`);
+          }
         })
         .catch(() => {
           setStatus('Data loading error');
