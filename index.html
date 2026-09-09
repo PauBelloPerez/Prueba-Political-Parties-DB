@@ -1038,7 +1038,7 @@ margin: 4px -6px 0;
           </div>
           <div class="selection-stat">
             <strong id="selectionParties">&mdash;</strong>
-            <span>parties</span>
+            <span>regional branches</span>
           </div>
           <div class="selection-stat">
             <strong id="selectionRegions">&mdash;</strong>
@@ -1169,6 +1169,14 @@ margin: 4px -6px 0;
           ['Party chair', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
           ['National Party Name', 'Party family'], ['Vernacular Party name', 'Vernacular Party Name'],
           ['Co-leadership', 'Co-leadership'], ['Comment', 'Comments']
+        ],
+        Spain: [
+          ['Country', 'Country'], ['Region', 'Region'], ['Party territorial unit', 'Party territorial unit'],
+          ['Regional Party Name', 'Party'], ['Interim', 'Interim leader (0= No; 1 =Yes)'],
+          ['Year became party chair', 'Year became leader'], ['Year ended as party chair', 'Year ended as leader'],
+          ['Party chair', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
+          ['National Party Name', 'Party family'], ['Vernacular Party Name', 'Vernacular Party Name'],
+          ['Co-leadership', 'Co-leadership'], ['Comment', 'Comments']
         ]
       });
 
@@ -1271,6 +1279,16 @@ margin: 4px -6px 0;
             'GERMANY_CDU_CSU.csv',
             'GERMANY_SPD.csv'
           ]
+        },
+        {
+          country: 'Spain',
+          folder: 'data/SPAIN',
+          files: [
+            'SPAIN_PCE_IU.csv',
+            'SPAIN_Podemos.csv',
+            'SPAIN_PP.csv',
+            'SPAIN_PSOE.csv'
+          ]
         }
       ].filter(source => isCountryEnabled(source.country));
 
@@ -1351,7 +1369,7 @@ margin: 4px -6px 0;
           (selParties.length
             ? selParties.some(group =>
                 group.country === r.Country &&
-                group.family === (r['Party family'] || r.Party)
+                group.family === partyGroupValue(r)
               )
             : true)
         );
@@ -1369,7 +1387,7 @@ margin: 4px -6px 0;
           cleanRows
             .map(row => {
               const country = (row.Country || '').toString().trim();
-              const family = (row['Party family'] || row.Party || '').toString().trim();
+              const family = partyGroupValue(row).toString().trim();
               return country && family ? `${country}\u0000${family}` : '';
             })
             .filter(Boolean)
@@ -1613,10 +1631,28 @@ margin: 4px -6px 0;
         return '';
       }
 
+      const PARTY_GROUP_ALIASES = Object.freeze({
+        Spain: Object.freeze({
+          "People's Alliance (AP)": "People's Party (PP)",
+          "People's Alliance (AP) / People's Party (PP)": "People's Party (PP)"
+        })
+      });
+
+      function normalizePartyGroup(country, family) {
+        const value = String(family ?? '').trim();
+        return PARTY_GROUP_ALIASES[country]?.[value] || value;
+      }
+
+      function partyGroupValue(row) {
+        return row['Party group'] || row['Party family'] || row.Party || '';
+      }
+
       function normalizeRow(record) {
         const r = cleanRecordKeys(record);
+        const country = firstValue(r, ['Country', 'COUNTRY']);
+        const partyFamily = firstValue(r, ['Party family', 'National Sister Party', 'National Party Name', 'Party', 'PTYNAME']);
         return {
-          Country: firstValue(r, ['Country', 'COUNTRY']),
+          Country: country,
           Region: firstValue(r, ['Region']),
           Comments: firstValue(r, ['Comments', 'Comment']),
           Party: firstValue(r, ['Party', 'Regional Party Name', 'PTYNAME']),
@@ -1632,7 +1668,8 @@ margin: 4px -6px 0;
             'Female chair'
           ])),
           'Co-leadership': numericOrBlank(firstValue(r, ['Co-leadership'])),
-          'Party family': firstValue(r, ['Party family', 'National Sister Party', 'National Party Name', 'Party', 'PTYNAME']),
+          'Party family': partyFamily,
+          'Party group': normalizePartyGroup(country, partyFamily),
           'Vernacular Party Name': firstValue(r, ['Vernacular Party Name', 'Vernacular Party name'])
         };
       }
@@ -1643,7 +1680,8 @@ margin: 4px -6px 0;
           row.Region,
           row.Party,
           row['Party leader'],
-          row['Party family']
+          row['Party family'],
+          partyGroupValue(row)
         ].map(value => String(value ?? '').toLowerCase());
       }
 
@@ -1833,7 +1871,7 @@ margin: 4px -6px 0;
         partiesDataCombined.forEach(r => {
           if (r.Country === name) {
             obs++;
-            const family = String(r['Party family'] || r.Party || '').trim().toLowerCase();
+            const family = String(partyGroupValue(r)).trim().toLowerCase();
             if (family) families.add(family);
           }
         });
@@ -1921,7 +1959,7 @@ margin: 4px -6px 0;
         const familyCountries = new Map();
         partiesDataCombined.forEach(r => {
           const country = r.Country;
-          const family = r['Party family'] || r.Party;
+          const family = partyGroupValue(r);
           if (country === selectedCountry && family) {
             const familyKey = String(family).trim().toLowerCase();
             if (!familyCountries.has(familyKey)) familyCountries.set(familyKey, new Set());
