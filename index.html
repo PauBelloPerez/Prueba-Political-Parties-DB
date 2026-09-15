@@ -1137,6 +1137,33 @@ margin: 4px -6px 0;
 
       const isCountryEnabled = country => COUNTRY_ENABLED[country] === true;
 
+      // Visual regional borders only. Set a country to false to hide its subdivisions.
+      const REGION_BOUNDARIES_ENABLED = Object.freeze({
+        Austria: true,
+        France: true,
+        Germany: true,
+        Italy: true,
+        Portugal: false,
+        Spain: true,
+        Switzerland: true,
+        'United Kingdom': true,
+        Canada: true,
+        Australia: true
+      });
+
+      const REGION_BOUNDARY_FILES = Object.freeze({
+        Austria: 'Regions_AUSTRIA.json',
+        France: 'Regions_FRANCE.json',
+        Germany: 'Regions_GERMANY.json',
+        Italy: 'Regions_ITALY.json',
+        Portugal: 'Regions_PORTUGAL.json',
+        Spain: 'Regions_SPAIN.json',
+        Switzerland: 'Regions_SWITZERLAND.json',
+        'United Kingdom': 'Regions_UK.json',
+        Canada: 'CanadaRegions.geojson',
+        Australia: 'AustraliaStates.geojson'
+      });
+
       // Preview and export headers follow the terminology of each source dataset.
       // The second value is the normalized internal key used by filters and sorting.
       const COUNTRY_COLUMNS = Object.freeze({
@@ -1214,6 +1241,7 @@ margin: 4px -6px 0;
       });
 
       // ========== Map Configuration ==========
+      const COUNTRY_BORDER_WEIGHT = 1.4;
       const maps = [
         {
           name: 'Europe',
@@ -1222,7 +1250,7 @@ margin: 4px -6px 0;
           countries: ['Austria', 'France', 'Germany', 'Italy', 'Portugal', 'Spain', 'Switzerland', 'United Kingdom'],
           bounds: [[20, -40], [72, 50]],
           zoom: 4,
-          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 },
+          style: { color: '#F4EFE2', weight: COUNTRY_BORDER_WEIGHT, fillColor: '#F4EFE2', fillOpacity: 0.28 },
           filter: f => isCountryEnabled(f.properties.NAME)
         },
         {
@@ -1233,7 +1261,7 @@ margin: 4px -6px 0;
           bounds: [[20, -141], [83, -52]],
           center: [20, -96],
           zoom: 3,
-          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 },
+          style: { color: '#F4EFE2', weight: COUNTRY_BORDER_WEIGHT, fillColor: '#F4EFE2', fillOpacity: 0.28 },
           filter: f => isCountryEnabled(f.properties.name)
         },
         {
@@ -1243,7 +1271,7 @@ margin: 4px -6px 0;
           countries: ['Australia'],
           bounds: [[-44, 112], [-10, 154]],
           zoom: 4,
-          style: { color: '#F4EFE2', weight: 1, fillColor: '#F4EFE2', fillOpacity: 0.28 },
+          style: { color: '#F4EFE2', weight: COUNTRY_BORDER_WEIGHT, fillColor: '#F4EFE2', fillOpacity: 0.28 },
           filter: f => isCountryEnabled(f.properties.name)
         }
       ];
@@ -1313,6 +1341,8 @@ margin: 4px -6px 0;
       // ========== State Variables ==========
       let currentMapIdx = 0;
       let countriesLayer;
+      let regionsLayer;
+      let mapLoadId = 0;
       let selectedCountry = '';
       let selectedPartyGroups = new Set();
       let partiesDataMain = [];
@@ -1422,6 +1452,9 @@ margin: 4px -6px 0;
         maxZoom: 7
       }).setView([50, 10], 4);
       L.control.zoom({ position: 'topright' }).addTo(map);
+      const visualRegionsPane = map.createPane('visualRegions');
+      visualRegionsPane.style.zIndex = 450;
+      visualRegionsPane.style.pointerEvents = 'none';
 
       $('#resetView').addEventListener('click', () => fitToSelectionOrScope());
 
@@ -1834,13 +1867,19 @@ margin: 4px -6px 0;
 
       function loadMap() {
         const cfg = maps[currentMapIdx];
+        const loadId = ++mapLoadId;
         map.setMaxBounds(cfg.bounds);
         if (countriesLayer) countriesLayer.remove();
+        if (regionsLayer) regionsLayer.remove();
+        countriesLayer = null;
+        regionsLayer = null;
         map.setView(scopeCenter(cfg), cfg.zoom);
+        loadRegionalBoundaries(cfg, loadId);
 
         fetch(cfg.file)
           .then(r => r.json())
           .then(data => {
+            if (loadId !== mapLoadId) return;
             let feats = data.features.filter(f => f.properties && typeof f.properties[cfg.prop] !== 'undefined');
             if (cfg.filter) feats = feats.filter(cfg.filter);
 
@@ -1853,7 +1892,7 @@ margin: 4px -6px 0;
                 const name = f.properties[cfg.prop];
                 const isSel = selectedCountry === name;
                 return Object.assign({}, base, {
-                  weight: isSel ? 3 : 1,
+                  weight: isSel ? 3 : COUNTRY_BORDER_WEIGHT,
                   fillOpacity: isSel ? 0.65 : 0.5
                 });
               },
@@ -1870,11 +1909,117 @@ margin: 4px -6px 0;
                   l.setTooltipContent(buildCountryTip(name));
                 });
                 l.on('mouseover', () => l.setStyle({ weight: 3 }));
-                l.on('mouseout', () => { if (selectedCountry !== name) l.setStyle({ weight: 1 }); });
+                l.on('mouseout', () => { if (selectedCountry !== name) l.setStyle({ weight: COUNTRY_BORDER_WEIGHT }); });
               }
             }).addTo(map);
+
           })
           .catch(() => showToast('Failed to load GeoJSON for ' + cfg.name));
+      }
+
+      function loadRegionalBoundaries(cfg, loadId) {
+        const countries = cfg.countries.filter(country =>
+          isCountryEnabled(country) && REGION_BOUNDARIES_ENABLED[country] === true
+        );
+        if (!countries.length) return;
+
+        Promise.allSettled(countries.map(country => {
+          const file = REGION_BOUNDARY_FILES[country];
+          return fetch(file)
+            .then(response => {
+              if (!response.ok) throw new Error(`${file}: HTTP ${response.status}`);
+              return response.json();
+            })
+            .then(data => {
+              if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) {
+                throw new Error(`${file}: invalid GeoJSON`);
+              }
+              const boundary = internalRegionalBoundaryFeature(data.features, country);
+              return boundary ? [boundary] : [];
+            });
+        })).then(results => {
+          if (loadId !== mapLoadId) return;
+          const features = results.flatMap(result =>
+            result.status === 'fulfilled' ? result.value : []
+          );
+          const failed = results.filter(result => result.status === 'rejected');
+          failed.forEach(result => console.error('Failed to load regional boundaries:', result.reason));
+          if (!features.length) return;
+
+          regionsLayer = L.geoJSON({ type: 'FeatureCollection', features }, {
+            pane: 'visualRegions',
+            interactive: false,
+            style: feature => regionBoundaryStyle(feature.mapCountry)
+          }).addTo(map);
+        });
+      }
+
+      function internalRegionalBoundaryFeature(sourceFeatures, country) {
+        const features = sourceFeatures.filter(feature =>
+          feature.geometry && feature.properties?.GID_0 !== 'NA'
+        );
+        const segments = new Map();
+        const vertexOwners = new Map();
+
+        features.forEach((feature, owner) => {
+          const geometry = feature.geometry;
+          const polygons = geometry.type === 'MultiPolygon'
+            ? geometry.coordinates
+            : geometry.type === 'Polygon' ? [geometry.coordinates] : [];
+
+          polygons.forEach(polygon => polygon.forEach(ring => {
+            for (let i = 1; i < ring.length; i++) {
+              const a = ring[i - 1];
+              const b = ring[i];
+              const aKey = a.join(',');
+              const bKey = b.join(',');
+              if (aKey === bKey) continue;
+              const key = aKey < bKey ? `${aKey}|${bKey}` : `${bKey}|${aKey}`;
+
+              [aKey, bKey].forEach(vertex => {
+                if (!vertexOwners.has(vertex)) vertexOwners.set(vertex, new Set());
+                vertexOwners.get(vertex).add(owner);
+              });
+
+              const existing = segments.get(key);
+              if (existing) {
+                if (existing.owner !== owner) existing.shared = true;
+              } else {
+                segments.set(key, { owner, a, b, aKey, bKey, shared: false });
+              }
+            }
+          }));
+        });
+
+        const isSharedVertex = (vertex, owner) =>
+          Array.from(vertexOwners.get(vertex) || []).some(other => other !== owner);
+        const coordinates = [];
+        segments.forEach(segment => {
+          // Some long Australian inland borders have matching endpoints but different intermediate vertices.
+          const longInteriorEdge =
+            Math.hypot(segment.b[0] - segment.a[0], segment.b[1] - segment.a[1]) > 1 &&
+            isSharedVertex(segment.aKey, segment.owner) &&
+            isSharedVertex(segment.bKey, segment.owner);
+          if (segment.shared || longInteriorEdge) coordinates.push([segment.a, segment.b]);
+        });
+
+        if (!coordinates.length) return null;
+        return {
+          type: 'Feature',
+          mapCountry: country,
+          properties: {},
+          geometry: { type: 'MultiLineString', coordinates }
+        };
+      }
+
+      function regionBoundaryStyle(country) {
+        const isSelected = selectedCountry === country;
+        return {
+          color: isSelected ? '#617C73' : '#BFAFA2',
+          weight: isSelected ? 1.1 : 0.7,
+          opacity: isSelected ? 0.95 : 0.85,
+          fillOpacity: 0
+        };
       }
 
       function toggleCountrySelection(name) {
@@ -1921,10 +2066,13 @@ margin: 4px -6px 0;
             const cfg = maps[currentMapIdx];
             const name = l.feature.properties[cfg.prop];
             l.setStyle({
-              weight: selectedCountry === name ? 3 : 1,
+              weight: selectedCountry === name ? 3 : COUNTRY_BORDER_WEIGHT,
               fillOpacity: selectedCountry === name ? 0.65 : 0.5
             });
           });
+        }
+        if (regionsLayer) {
+          regionsLayer.eachLayer(l => l.setStyle(regionBoundaryStyle(l.feature.mapCountry)));
         }
 
         const hasSelection = Boolean(selectedCountry);
