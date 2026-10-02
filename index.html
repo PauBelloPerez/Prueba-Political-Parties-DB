@@ -1220,6 +1220,14 @@ margin: 4px -6px 0;
           ['Party chair', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
           ['National Party Name', 'Party family'], ['Vernacular Party Name', 'Vernacular Party Name'],
           ['Co-leadership', 'Co-leadership'], ['Comment', 'Comments']
+        ],
+        'United Kingdom': [
+          ['Country', 'Country'], ['Region', 'Region'], ['Party territorial unit', 'Party territorial unit'],
+          ['Regional Party Name', 'Party'], ['Interim', 'Interim leader (0= No; 1 =Yes)'],
+          ['Year became party chair', 'Year became leader'], ['Year ended as party chair', 'Year ended as leader'],
+          ['Party chair', 'Party leader'], ['Female', 'Female leader (0= male; 1 = female)'],
+          ['National Party Name', 'Party family'], ['Vernacular Party Name', 'Vernacular Party Name'],
+          ['Co-leadership', 'Co-leadership'], ['Comment', 'Comments']
         ]
       });
 
@@ -1356,6 +1364,16 @@ margin: 4px -6px 0;
             'SPAIN_Podemos.csv',
             'SPAIN_PP.csv',
             'SPAIN_PSOE.csv'
+          ]
+        },
+        {
+          country: 'United Kingdom',
+          folder: 'data/UK',
+          files: [
+            'UK_Conservative.csv',
+            'UK_Greens.csv',
+            'UK_Labour.csv',
+            'UK_LibDem.csv'
           ]
         }
       ].filter(source => isCountryEnabled(source.country));
